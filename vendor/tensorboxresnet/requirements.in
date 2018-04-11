@@ -1,0 +1,5 @@
+runcython3>=0.2.5
+opencv-python>=3.2
+scipy>=0.15.1
+Pillow==2.6.0
+tensorflow==1.0.0

@@ -1,0 +1,331 @@
+{
+  "dpi": 100,
+  "error": null,
+  "figures": [
+    {
+      "caption_boundary": {
+        "x1": 443.75004238552515,
+        "x2": 775.006612141927,
+        "y1": 317.0409732394748,
+        "y2": 425.63612196180554
+      },
+      "caption_text": "Figure 1: A scholarly document (left, page from (Chan and Airoldi 2014)), and the same document with body text masked with filled boxes, captions masked with empty boxes, and tables and figures removed (right). By examining the right image it is easy to guess which regions of the page each caption refers to, even without knowing the text, what the captions say, and anything about the graphical elements on the page.",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 444.0,
+        "x2": 775.0,
+        "y1": 75.0,
+        "y2": 297.0
+      },
+      "figure_type": "Figure",
+      "name": "1",
+      "page": 1,
+      "page_height": 0,
+      "page_width": 0
+    },
+    {
+      "caption_boundary": {
+        "x1": 75.0,
+        "x2": 774.9971177842882,
+        "y1": 360.4451921251085,
+        "y2": 411.7500305175781
+      },
+      "caption_text": "Figure 2: Classifying regions within a scholarly document. All text in the document (first panel, page from (Neyshabur and others 2013)) is located and grouped into blocks (second panel). Next the graphical components are isolated and used to determine regions of the page that contain graphics (third panel). To build the final output (fourth panel) these two elements are put together and each text block is classified as body text (filled boxes), image text (box outlines), or caption (box outlines).",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 112.0,
+        "x2": 737.0,
+        "y1": 75.0,
+        "y2": 341.0
+      },
+      "figure_type": "Figure",
+      "name": "2",
+      "page": 3,
+      "page_height": 0,
+      "page_width": 0
+    },
+    {
+      "caption_boundary": {
+        "x1": 443.75,
+        "x2": 775.006612141927,
+        "y1": 635.8534918891058,
+        "y2": 744.4486829969618
+      },
+      "caption_text": "Figure 3: Example of a figure and table being directly adjacent (left panel, from (Liu, He, and Chang 2010)). In this case the proposed figure regions for each caption will by identical and encompass both the plot and table (right, solid lines). We handle this case by detecting that the region is divided in the middle by a section of whitespace, and then splitting the proposed figure region across that whitespace (dashed line).",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 459.0,
+        "x2": 759.0,
+        "y1": 442.0,
+        "y2": 616.0
+      },
+      "figure_type": "Figure",
+      "name": "3",
+      "page": 3,
+      "page_height": 0,
+      "page_width": 0
+    },
+    {
+      "caption_boundary": {
+        "x1": 473.227776421441,
+        "x2": 745.5250210232205,
+        "y1": 151.37851503160263,
+        "y2": 159.71527099609375
+      },
+      "caption_text": "Table 1: Precision and recall on figure extraction.",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 444.0,
+        "x2": 775.0,
+        "y1": 75.0,
+        "y2": 152.0
+      },
+      "figure_type": "Table",
+      "name": "1",
+      "page": 4,
+      "page_height": 0,
+      "page_width": 0
+    },
+    {
+      "caption_boundary": {
+        "x1": 475.9180704752604,
+        "x2": 742.832777235243,
+        "y1": 240.72430928548175,
+        "y2": 249.06107584635416
+      },
+      "caption_text": "Table 2: Precision and recall on table extraction.",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 444.0,
+        "x2": 775.0,
+        "y1": 162.0,
+        "y2": 242.0
+      },
+      "figure_type": "Table",
+      "name": "2",
+      "page": 4,
+      "page_height": 0,
+      "page_width": 0
+    },
+    {
+      "caption_boundary": {
+        "x1": 75.0,
+        "x2": 406.25648498535156,
+        "y1": 318.46461825900604,
+        "y2": 484.34872097439234
+      },
+      "caption_text": "Figure 4: Disambiguating caption to empty space pairing. From the original document (left panel, page from (Aziz and others 2011)) text regions and caption regions are detected (shown as filled and empty boxes in the right panel). At this point it is ambiguous what space to assign to the middle caption, labelled as \u2018B\u2019, because considered in isolation this caption could plausibly refer to the region above or the region below it. However our algorithm detects that the lower caption, caption C, only has one large, empty region of space nearby that it could refer to. Once it is known that that space has to be assigned to caption C it becomes clear caption B must be referring to the region above it.",
+      "dpi": 0,
+      "figure_boundary": {
+        "x1": 75.0,
+        "x2": 406.0,
+        "y1": 75.0,
+        "y2": 299.0
+      },
+      "figure_type": "Figure",
+      "name": "4",
+      "page": 4,
+      "page_height": 0,
+      "page_width": 0
+    }
+  ],
+  "pdf": "tests/data/endtoend/paper.pdf",
+  "raw_detected_boxes": [
+    [],
+    [
+      {
+        "x1": 444.0,
+        "x2": 775.0,
+        "y1": 77.0,
+        "y2": 297.0
+      }
+    ],
+    [],
+    [
+      {
+        "x1": 114.0,
+        "x2": 737.0,
+        "y1": 75.0,
+        "y2": 340.0
+      },
+      {
+        "x1": 459.0,
+        "x2": 759.0,
+        "y1": 442.0,
+        "y2": 616.0
+      }
+    ],
+    [
+      {
+        "x1": 444.0,
+        "x2": 775.0,
+        "y1": 75.0,
+        "y2": 135.0
+      },
+      {
+        "x1": 445.0,
+        "x2": 766.0,
+        "y1": 179.0,
+        "y2": 225.0
+      },
+      {
+        "x1": 75.0,
+        "x2": 403.0,
+        "y1": 76.0,
+        "y2": 299.0
+      }
+    ],
+    []
+  ],
+  "raw_pdffigures_output": {
+    "figures": [
+      {
+        "caption": "Table 1: Precision and recall on figure extraction.",
+        "captionBoundary": {
+          "x1": 340.7239990234375,
+          "x2": 536.7780151367188,
+          "y1": 108.9925308227539,
+          "y2": 114.9949951171875
+        },
+        "figType": "Table",
+        "imageText": [
+          "Precision",
+          "Recall",
+          "F1",
+          "Ours",
+          "0.957",
+          "0.915",
+          "0.936",
+          "Praczyk",
+          "and",
+          "Nogueras-Iso",
+          "0.624",
+          "0.500",
+          "0.555",
+          "pd\ufb01mages",
+          "0.198",
+          "0.116",
+          "0.146"
+        ],
+        "name": "1",
+        "page": 4,
+        "regionBoundary": {
+          "x1": 319.0,
+          "x2": 558.0,
+          "y1": 54.0,
+          "y2": 98.0
+        }
+      },
+      {
+        "caption": "Table 2: Precision and recall on table extraction.",
+        "captionBoundary": {
+          "x1": 342.6610107421875,
+          "x2": 534.839599609375,
+          "y1": 173.32150268554688,
+          "y2": 179.323974609375
+        },
+        "figType": "Table",
+        "imageText": [
+          "Precision",
+          "Recall",
+          "F1",
+          "Ours",
+          "0.952",
+          "0.927",
+          "0.939",
+          "Praczyk",
+          "and",
+          "Nogueras-Iso",
+          "0.429",
+          "0.363",
+          "0.393"
+        ],
+        "name": "2",
+        "page": 4,
+        "regionBoundary": {
+          "x1": 319.0,
+          "x2": 558.0,
+          "y1": 129.0,
+          "y2": 162.0
+        }
+      },
+      {
+        "caption": "Figure 4: Disambiguating caption to empty space pairing. From the original document (left panel, page from (Aziz and others 2011)) text regions and caption regions are detected (shown as filled and empty boxes in the right panel). At this point it is ambiguous what space to assign to the middle caption, labelled as \u2018B\u2019, because considered in isolation this caption could plausibly refer to the region above or the region below it. However our algorithm detects that the lower caption, caption C, only has one large, empty region of space nearby that it could refer to. Once it is known that that space has to be assigned to caption C it becomes clear caption B must be referring to the region above it.",
+        "captionBoundary": {
+          "x1": 54.0,
+          "x2": 292.5046691894531,
+          "y1": 229.29452514648438,
+          "y2": 348.7310791015625
+        },
+        "figType": "Figure",
+        "imageText": [],
+        "name": "4",
+        "page": 4,
+        "regionBoundary": {
+          "x1": 54.0,
+          "x2": 293.0,
+          "y1": 54.0,
+          "y2": 216.0
+        }
+      },
+      {
+        "caption": "Figure 1: A scholarly document (left, page from (Chan and Airoldi 2014)), and the same document with body text masked with filled boxes, captions masked with empty boxes, and tables and figures removed (right). By examining the right image it is easy to guess which regions of the page each caption refers to, even without knowing the text, what the captions say, and anything about the graphical elements on the page.",
+        "captionBoundary": {
+          "x1": 319.5000305175781,
+          "x2": 558.0047607421875,
+          "y1": 228.26950073242188,
+          "y2": 306.4580078125
+        },
+        "figType": "Figure",
+        "imageText": [],
+        "name": "1",
+        "page": 1,
+        "regionBoundary": {
+          "x1": 319.0,
+          "x2": 558.0,
+          "y1": 53.0,
+          "y2": 214.0
+        }
+      },
+      {
+        "caption": "Figure 3: Example of a figure and table being directly adjacent (left panel, from (Liu, He, and Chang 2010)). In this case the proposed figure regions for each caption will by identical and encompass both the plot and table (right, solid lines). We handle this case by detecting that the region is divided in the middle by a section of whitespace, and then splitting the proposed figure region across that whitespace (dashed line).",
+        "captionBoundary": {
+          "x1": 319.5,
+          "x2": 558.0047607421875,
+          "y1": 457.81451416015625,
+          "y2": 536.0030517578125
+        },
+        "figType": "Figure",
+        "imageText": [],
+        "name": "3",
+        "page": 3,
+        "regionBoundary": {
+          "x1": 330.0,
+          "x2": 547.0,
+          "y1": 318.0,
+          "y2": 444.0
+        }
+      },
+      {
+        "caption": "Figure 2: Classifying regions within a scholarly document. All text in the document (first panel, page from (Neyshabur and others 2013)) is located and grouped into blocks (second panel). Next the graphical components are isolated and used to determine regions of the page that contain graphics (third panel). To build the final output (fourth panel) these two elements are put together and each text block is classified as body text (filled boxes), image text (box outlines), or caption (box outlines).",
+        "captionBoundary": {
+          "x1": 54.0,
+          "x2": 557.9979248046875,
+          "y1": 259.5205383300781,
+          "y2": 296.46002197265625
+        },
+        "figType": "Figure",
+        "imageText": [],
+        "name": "2",
+        "page": 3,
+        "regionBoundary": {
+          "x1": 81.0,
+          "x2": 532.0,
+          "y1": 53.0,
+          "y2": 246.0
+        }
+      }
+    ],
+    "regionless-captions": []
+  }
+}

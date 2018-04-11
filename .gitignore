@@ -1,0 +1,15 @@
+# PDFFigures2
+pdffigures2/
+
+# python files
+*__pycache__
+*pyc
+*pyo
+
+# editor files
+*~
+\#*\#
+
+# build files
+*.so
+*.o
