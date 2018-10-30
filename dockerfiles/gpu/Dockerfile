@@ -43,8 +43,6 @@ RUN pip3 install --upgrade pip \
  && pip install Cython==0.25.2
 RUN pip3 install -r ./requirements.txt
 
-ADD ./vendor/tensorbox /work/vendor/tensorbox
-RUN pip3 install -e /work/vendor/tensorbox
 ADD ./vendor/tensorboxresnet /work/vendor/tensorboxresnet
 RUN pip3 install -e /work/vendor/tensorboxresnet
 
