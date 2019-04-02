@@ -10,12 +10,6 @@ The generated dataset used in our paper is available for download [here][deepfig
 
 **Note:** This is research code and is not intended for use in production.
 
-
-Demo
-----
-To quickly try our system on your own papers, try our online [demo][deepfigures-demo]!
-
-
 Setup: Running the Model
 ------------------------
 
