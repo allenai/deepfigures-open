@@ -61,6 +61,4 @@ RUN pip3 install -e /work/vendor/tensorboxresnet
 ADD . /work
 RUN pip3 install --quiet -e /work
 
-RUN pip3 install Pillow
-
 CMD [ "/bin/bash" ]
