@@ -6,7 +6,7 @@ from typing import Callable, Dict, Iterable, List, Tuple, TypeVar
 from matplotlib import axes
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy as sp
+from scipy import optimize
 from deepfigures.utils import file_util
 from deepfigures.extraction.renderers import PDFRenderer
 from deepfigures.extraction.exceptions import LatexException
@@ -74,7 +74,7 @@ def pair_boxes(a_boxes: List[BoxClass],
         for (b_idx, b_box) in enumerate(b_boxes):
             cost_matrix[a_idx, b_idx] = a_box.distance_to_other(b_box)
     assert (cost_matrix != np.nan).all()
-    (a_indices, b_indices) = sp.optimize.linear_sum_assignment(cost_matrix)
+    (a_indices, b_indices) = optimize.linear_sum_assignment(cost_matrix)
     assert len(a_indices) == len(b_indices)
     return a_indices, b_indices
 

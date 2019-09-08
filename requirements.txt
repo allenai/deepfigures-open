@@ -20,7 +20,7 @@ opencv-python
 pandas
 pytest
 pytest-xdist==1.18.2
-scipy
+scipy=1.1.0
 scikit-image
 seaborn
 tqdm
