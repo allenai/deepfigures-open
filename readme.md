@@ -1,5 +1,8 @@
 deepfigures-open
 ================
+
+Please click [here][instructions-for-this-fork] for the instructions for this fork.
+
 Figure extraction using deep neural nets.
 
 `deepfigures-open` is the companion code to the paper
@@ -138,3 +141,4 @@ For questions, contact the authors of the paper
 [deepfigures-weights]: https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/deepfigures/weights.tar.gz
 [pmc-open-access]: https://www.ncbi.nlm.nih.gov/pmc/tools/openftlist/
 [arxiv-bulk-data]: https://arxiv.org/help/bulk_data_s3
+[instructions-for-this-fork]: https://github.com/SampannaKahu/deepfigures-open/instructions-for-this-fork.md
