@@ -18,4 +18,23 @@ Version 1.3.0 of scipy does not have imread and imsave in scipy.misc. As a resul
 Imported it separately using ```from scipy import optimize``` and started using it like ```scipy.optimize()```.
 
 
+## Instruction to run this fork:
+
+#### Pull the compiled docker image:
+```shell script
+sudo docker pull sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.1
+```
+
+#### ssh into the pulled image by running it:
+```shell script
+sudo docker run -it --volume /home/sampanna/deepfigures-results:/work/host-output --volume /home/sampanna/deepfigures-results/31219:/work/host-input sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.1 /bin/bash
+```
+Here, the first '--volume' argument connects the local output directory with the docker output directory. The second '--volume' argument does the same for the input directory. Please modify the local file paths as per your local host system.
+
+#### Execute the desired commands:
+```shell script
+python vendor/tensorboxresnet/tensorboxresnet/train.py --hypes weights/hypes.json --gpu 0 --logdir host-output
+```
+Once inside the docker environment, use the brash access to run any required commands. For example, the above command starts training.
+
 [docker-hub-link]: https://hub.docker.com/r/sampyash/vt_cs_6604_digital_libraries/tags
