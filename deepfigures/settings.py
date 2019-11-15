@@ -17,12 +17,14 @@ VERSION = '0.0.1'
 # descriptions of the docker images deepfigures builds
 DEEPFIGURES_IMAGES = {
     'cpu': {
-        'tag': 'deepfigures-cpu',
-        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/cpu/Dockerfile')
+        'tag': 'sampyash/vt_cs_6604_digital_libraries',
+        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/cpu/Dockerfile'),
+        'version_prefix': 'deepfigures_cpu_'
     },
     'gpu': {
-        'tag': 'deepfigures-gpu',
-        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/gpu/Dockerfile')
+        'tag': 'sampyash/vt_cs_6604_digital_libraries',
+        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/gpu/Dockerfile'),
+        'version_prefix': 'deepfigures_gpu_'
     }
 }
 
