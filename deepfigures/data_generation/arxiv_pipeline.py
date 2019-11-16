@@ -357,11 +357,12 @@ def run_on_all() -> None:
     grouped_tarnames = figure_utils.ordered_group_by(
         tarnames, lambda x: True
     )
+    count = 0
     for group_key, group_tars in grouped_tarnames.items():
         print(datetime.datetime.now())
-        with tempfile.TemporaryDirectory(
-            prefix=settings.ARXIV_DATA_TMP_DIR
-        ) as tmpdir:
+        current_time_millis = int(round(time.time() * 1000))
+        with open(os.path.join(settings.ARXIV_DATA_TMP_DIR, str(current_time_millis))) as tmpdir:
+        # with tempfile.TemporaryDirectory(prefix=settings.ARXIV_DATA_TMP_DIR) as tmpdir:
             tmpdir += '/'
             f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
             print(
@@ -377,6 +378,7 @@ def run_on_all() -> None:
                 paper_tarname_file.write(json.dumps(paper_tarnames))
             # with multiprocessing.Pool(processes=round(2 * os.cpu_count())) as p:
             #     p.map(process_paper_tar, paper_tarnames)
+            count = count + 1
 
 
 if __name__ == "__main__":
