@@ -59,7 +59,7 @@ ARXIV_DIFF_DIR = os.path.join(
 ARXIV_FIGURE_JSON_DIR = os.path.join(
     settings.ARXIV_DATA_OUTPUT_DIR,
     'figure-jsons/')
-MAX_PAGES = 50
+MAX_PAGES = 50 # TODO: Change this for VTechWorks. Make it much higher.
 
 ARXIV_TAR_SRC = 's3://arxiv/src/'
 ARXIV_TAR_RE = re.compile(
@@ -340,7 +340,7 @@ def download_and_extract_tar(
             logging.exception('Download failed, retrying')
             time.sleep(10)
     file_util.extract_tarfile(cached_file, extract_dir)
-    os.remove(cached_file)
+    # os.remove(cached_file)
 
 
 def run_on_all() -> None:
@@ -350,6 +350,7 @@ def run_on_all() -> None:
         tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
         if os.path.splitext(tarname)[1] == '.tar'
     ]
+    # tarnames = ['s3://arxiv/src/arXiv_src_1001_001.tar']
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
     grouped_tarnames = figure_utils.ordered_group_by(

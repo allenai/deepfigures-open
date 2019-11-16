@@ -35,7 +35,7 @@ def _is_okay_cache_dir(name):
 
 def _cache_dir():
     dirs = [
-        '/tmp/deepfigures-cache/',
+        '/mnt/ceph/shared/arxiv/cache',
     ]
     for name in dirs:
         if _is_okay_cache_dir(name):
@@ -148,7 +148,7 @@ def cache_file(name):
     logging.info('Cache file for %s does not exist, copying.', name)
     parse = _parse_s3_location(name)
     retcode = subprocess.call(
-        'aws s3api get-object --bucket "%s" --key "%s" "%s.tmp.%d" --request-payer=requester'
+        'aws2 s3api get-object --bucket "%s" --key "%s" "%s.tmp.%d" --request-payer=requester'
         % (parse['bucket'], parse['key'], target_filename, os.getpid()),
         stdout=subprocess.DEVNULL,
         shell=True
