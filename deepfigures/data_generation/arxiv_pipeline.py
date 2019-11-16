@@ -8,6 +8,7 @@ import multiprocessing
 import multiprocessing.pool
 import re
 import time
+import json
 import functools
 import collections
 from typing import List, Optional, Tuple
@@ -371,13 +372,11 @@ def run_on_all() -> None:
                 p.map(f, group_tars)
             paper_tarnames = glob.glob(tmpdir + '*/*.gz')
             print(datetime.datetime.now())
-            print(
-                'Processing %d papers in group %s' %
-                (len(paper_tarnames), str(group_key))
-            )
-            with multiprocessing.Pool(processes=round(2 * os.cpu_count())
-                                     ) as p:
-                p.map(process_paper_tar, paper_tarnames)
+            print('Processing %d papers in group %s' % (len(paper_tarnames), str(group_key)))
+            with open(os.path.join(ARXIV_SRC_DIR, "{}_paper_tar_names.txt".format(group_key)), mode='w') as paper_tarname_file:
+                paper_tarname_file.write(json.dumps(paper_tarnames))
+            # with multiprocessing.Pool(processes=round(2 * os.cpu_count())) as p:
+            #     p.map(process_paper_tar, paper_tarnames)
 
 
 if __name__ == "__main__":
