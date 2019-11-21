@@ -40,7 +40,8 @@ RUN apt-get clean \
     texlive-latex-base \
     texlive-fonts-recommended \
     texlive-fonts-extra \
-    texlive-latex-extra
+    texlive-latex-extra \
+    texlive-font-utils
 
 WORKDIR /work
 
@@ -59,5 +60,13 @@ ADD . /work
 RUN pip3 install --quiet -e /work
 
 RUN pip3 install Pillow
+
+RUN apt-get install curl
+RUN curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN mkdir ~/.aws
+ADD credentials /work
+RUN cat /work/credentials > ~/.aws/credentials
 
 CMD [ "/bin/bash" ]

@@ -35,7 +35,7 @@ def _is_okay_cache_dir(name):
 
 def _cache_dir():
     dirs = [
-        '/mnt/ceph/shared/arxiv/cache',
+        '/tmp/deepfigures-cache/',
     ]
     for name in dirs:
         if _is_okay_cache_dir(name):

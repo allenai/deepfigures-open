@@ -56,9 +56,10 @@ DEEPFIGURES_PDF_RENDERER = 'deepfigures.extraction.renderers.GhostScriptRenderer
 # settings for data generation
 
 # The location to temporarily store arxiv source data
-ARXIV_DATA_TMP_DIR = '/mnt/ceph/shared/arxiv/tmp'
+ARXIV_DATA_TMP_DIR = '/work/host-output/arxiv_data_temp'
+# ARXIV_DATA_TMP_DIR = '/tmp'
 # The location to store the final output labels
-ARXIV_DATA_OUTPUT_DIR = '/mnt/ceph/shared/arxiv/output'
+ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
 
 # The location of the PMC open access data
 PUBMED_INPUT_DIR = ''
