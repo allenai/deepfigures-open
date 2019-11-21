@@ -8,6 +8,7 @@ import multiprocessing
 import multiprocessing.pool
 import re
 import time
+import json
 import functools
 import collections
 from typing import List, Optional, Tuple
@@ -59,7 +60,7 @@ ARXIV_DIFF_DIR = os.path.join(
 ARXIV_FIGURE_JSON_DIR = os.path.join(
     settings.ARXIV_DATA_OUTPUT_DIR,
     'figure-jsons/')
-MAX_PAGES = 50
+MAX_PAGES = 50 # TODO: Change this for VTechWorks. Make it much higher.
 
 ARXIV_TAR_SRC = 's3://arxiv/src/'
 ARXIV_TAR_RE = re.compile(
@@ -340,7 +341,7 @@ def download_and_extract_tar(
             logging.exception('Download failed, retrying')
             time.sleep(10)
     file_util.extract_tarfile(cached_file, extract_dir)
-    os.remove(cached_file)
+    # os.remove(cached_file)
 
 
 def run_on_all() -> None:
@@ -350,16 +351,20 @@ def run_on_all() -> None:
         tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
         if os.path.splitext(tarname)[1] == '.tar'
     ]
+    # tarnames = ['s3://arxiv/src/arXiv_src_1001_001.tar']
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
     grouped_tarnames = figure_utils.ordered_group_by(
         tarnames, lambda x: True
     )
+    count = 0
     for group_key, group_tars in grouped_tarnames.items():
         print(datetime.datetime.now())
-        with tempfile.TemporaryDirectory(
-            prefix=settings.ARXIV_DATA_TMP_DIR
-        ) as tmpdir:
+        current_time_millis = int(round(time.time() * 1000))
+        group_file_path = os.path.join(settings.ARXIV_DATA_TMP_DIR, str(current_time_millis))
+        os.mkdir(group_file_path)
+        with open(group_file_path) as tmpdir:
+        # with tempfile.TemporaryDirectory(prefix=settings.ARXIV_DATA_TMP_DIR) as tmpdir:
             tmpdir += '/'
             f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
             print(
@@ -370,18 +375,15 @@ def run_on_all() -> None:
                 p.map(f, group_tars)
             paper_tarnames = glob.glob(tmpdir + '*/*.gz')
             print(datetime.datetime.now())
-            print(
-                'Processing %d papers in group %s' %
-                (len(paper_tarnames), str(group_key))
-            )
-            with multiprocessing.Pool(processes=round(2 * os.cpu_count())
-                                     ) as p:
-                p.map(process_paper_tar, paper_tarnames)
+            print('Processing %d papers in group %s' % (len(paper_tarnames), str(group_key)))
+            with open(os.path.join(ARXIV_SRC_DIR, "{}_paper_tar_names.txt".format(group_key)), mode='w') as paper_tarname_file:
+                paper_tarname_file.write(json.dumps(paper_tarnames))
+            # with multiprocessing.Pool(processes=round(2 * os.cpu_count())) as p:
+            #     p.map(process_paper_tar, paper_tarnames)
+            count = count + 1
 
 
 if __name__ == "__main__":
     logging.basicConfig(filename='logger_arxiv.log', level=logging.WARNING)
     run_on_all()
     print('All done')
-
-
