@@ -361,7 +361,9 @@ def run_on_all() -> None:
     for group_key, group_tars in grouped_tarnames.items():
         print(datetime.datetime.now())
         current_time_millis = int(round(time.time() * 1000))
-        with open(os.path.join(settings.ARXIV_DATA_TMP_DIR, str(current_time_millis))) as tmpdir:
+        group_file_path = os.path.join(settings.ARXIV_DATA_TMP_DIR, str(current_time_millis))
+        os.mkdir(group_file_path)
+        with open(group_file_path) as tmpdir:
         # with tempfile.TemporaryDirectory(prefix=settings.ARXIV_DATA_TMP_DIR) as tmpdir:
             tmpdir += '/'
             f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
