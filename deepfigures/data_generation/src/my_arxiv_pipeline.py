@@ -54,6 +54,17 @@ def download_tar(tar_name):
         )
         if scp_retcode == 0:
             print("scp successful for {}".format(target_filename))
+            rm_command = 'rm "%s"' % target_filename
+            rm_retcode = subprocess.call(
+                rm_command,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                shell=True
+            )
+            if rm_retcode == 0:
+                print("Successfully removed {}".format(target_filename))
+            else:
+                print("Failed to remove: {}".format(target_filename))
         else:
             print("Non-zero return code for scp. Filename: {}".format(target_filename))
 
