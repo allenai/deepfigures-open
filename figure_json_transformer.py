@@ -3,12 +3,14 @@ import json
 
 # import tensorboxresnet.utils.annolist.AnnotationLib as al
 
-path = '/home/sampanna/deepfigures-results/arxiv_data_output/figure-jsons'
+figure_json_path = '/home/sampanna/deepfigures-results/arxiv_data_output/figure-jsons'
+output_figure_boundaries_path = 'figure_boundaries.json'
+output_caption_boundaries_path = 'caption_boundaries.json'
 
 figure_boundaries = []
 caption_boundaries = []
 
-for filename in Path(path).rglob('*.json'):
+for filename in Path(figure_json_path).rglob('*.json'):
     contents = json.load(open(str(filename)))
     for key, value in contents.items():
         if not len(value):
@@ -23,8 +25,8 @@ for filename in Path(path).rglob('*.json'):
         }
         figure_boundaries.append(figure_annotation)
         caption_boundaries.append(caption_annotation)
-# print(json.dumps(figure_boundaries))
 
-# json.dump(figure_boundaries, open('delete_this.json', mode='w'))
-#
-# annolist = al.parse('/home/sampanna/workspace/bdts2/deepfigures-second/deepfigures-open/delete_this.json', abs_path=True)
+json.dump(figure_boundaries, open(output_figure_boundaries_path, mode='w'))
+json.dump(caption_boundaries, open(output_caption_boundaries_path, mode='w'))
+
+# annolist = al.parse(output_figure_boundaries_path, abs_path=False)
