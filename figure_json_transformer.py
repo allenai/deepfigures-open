@@ -3,7 +3,7 @@ import json
 
 # import tensorboxresnet.utils.annolist.AnnotationLib as al
 
-figure_json_path = '/home/sampanna/deepfigures-results/arxiv_data_output/figure-jsons'
+figure_json_path = '/work/host-input/arxiv_data_output/figure-jsons'
 output_figure_boundaries_path = 'figure_boundaries.json'
 output_caption_boundaries_path = 'caption_boundaries.json'
 
