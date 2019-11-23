@@ -358,26 +358,27 @@ def run_on_all() -> None:
     )
     for group_key, group_tars in grouped_tarnames.items():
         print(datetime.datetime.now())
-        with tempfile.TemporaryDirectory(
-            prefix=settings.ARXIV_DATA_TMP_DIR
-        ) as tmpdir:
-            tmpdir += '/'
-            f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
-            print(
-                'Downloading %d tarfiles in group %s' %
-                (len(group_tars), str(group_key))
-            )
-            with multiprocessing.Pool() as p:
-                p.map(f, group_tars)
-            paper_tarnames = glob.glob(tmpdir + '*/*.gz')
-            print(datetime.datetime.now())
-            print(
-                'Processing %d papers in group %s' %
-                (len(paper_tarnames), str(group_key))
-            )
-            with multiprocessing.Pool(processes=round(2 * os.cpu_count())
-                                     ) as p:
-                p.map(process_paper_tar, paper_tarnames)
+        tmpdir = settings.ARXIV_DATA_TMP_DIR
+        # with tempfile.TemporaryDirectory(
+        #     prefix=settings.ARXIV_DATA_TMP_DIR
+        # ) as tmpdir:
+        # tmpdir += '/'
+        f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
+        print(
+            'Downloading %d tarfiles in group %s' %
+            (len(group_tars), str(group_key))
+        )
+        with multiprocessing.Pool() as p:
+            p.map(f, group_tars)
+        paper_tarnames = glob.glob(tmpdir + '*/*.gz')
+        print(datetime.datetime.now())
+        print(
+            'Processing %d papers in group %s' %
+            (len(paper_tarnames), str(group_key))
+        )
+        with multiprocessing.Pool(processes=round(2 * os.cpu_count())
+                                 ) as p:
+            p.map(process_paper_tar, paper_tarnames)
 
 
 if __name__ == "__main__":
