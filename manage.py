@@ -17,7 +17,8 @@ from scripts import (
     detectfigures,
     generatearxiv,
     generatepubmed,
-    testunits)
+    testunits,
+    train)
 
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,8 @@ subcommands = [
     detectfigures.detectfigures,
     generatearxiv.generatearxiv,
     generatepubmed.generatepubmed,
-    testunits.testunits
+    testunits.testunits,
+    train.train
 ]
 
 for subcommand in subcommands:
