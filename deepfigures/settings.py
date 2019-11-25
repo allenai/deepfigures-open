@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.realpath(__file__)))
 
 # version number for the current release
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 
 # descriptions of the docker images deepfigures builds
 DEEPFIGURES_IMAGES = {
