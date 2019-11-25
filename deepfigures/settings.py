@@ -3,6 +3,8 @@
 import logging
 import os
 
+from imgaug import augmenters as iaa
+
 
 logger = logging.getLogger(__name__)
 
@@ -12,17 +14,19 @@ BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.realpath(__file__)))
 
 # version number for the current release
-VERSION = '0.0.1'
+VERSION = '0.0.4'
 
 # descriptions of the docker images deepfigures builds
 DEEPFIGURES_IMAGES = {
     'cpu': {
-        'tag': 'deepfigures-cpu',
-        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/cpu/Dockerfile')
+        'tag': 'sampyash/vt_cs_6604_digital_libraries',
+        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/cpu/Dockerfile'),
+        'version_prefix': 'deepfigures_cpu_'
     },
     'gpu': {
-        'tag': 'deepfigures-gpu',
-        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/gpu/Dockerfile')
+        'tag': 'sampyash/vt_cs_6604_digital_libraries',
+        'dockerfile_path': os.path.join(BASE_DIR, 'dockerfiles/gpu/Dockerfile'),
+        'version_prefix': 'deepfigures_gpu_'
     }
 }
 
@@ -54,9 +58,10 @@ DEEPFIGURES_PDF_RENDERER = 'deepfigures.extraction.renderers.GhostScriptRenderer
 # settings for data generation
 
 # The location to temporarily store arxiv source data
-ARXIV_DATA_TMP_DIR = ''
+ARXIV_DATA_TMP_DIR = '/work/host-output/arxiv_data_temp'
 # The location to store the final output labels
-ARXIV_DATA_OUTPUT_DIR = ''
+ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
+ARXIV_DATA_CACHE_DIR = '/work/host-output/download_cache'
 
 # The location of the PMC open access data
 PUBMED_INPUT_DIR = ''
@@ -67,3 +72,12 @@ PUBMED_DISTANT_DATA_DIR = ''
 
 # a local directory for storing the output data
 LOCAL_PUBMED_DISTANT_DATA_DIR = ''
+
+seq = iaa.Sequential([
+    iaa.Affine(rotate=(-5, 5)),
+    iaa.AdditiveGaussianNoise(scale=(10, 60)),
+    iaa.SaltAndPepper(0.1),
+    iaa.GaussianBlur(sigma=0.5),
+    iaa.LinearContrast(alpha=1),
+    iaa.PerspectiveTransform(scale=0.025, keep_size=True)
+])

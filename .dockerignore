@@ -10,3 +10,6 @@
 !tests
 !vendor
 !weights
+!credentials
+!weights
+!figure_json_transformer.py

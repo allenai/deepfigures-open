@@ -13,3 +13,9 @@ pdffigures2/
 # build files
 *.so
 *.o
+
+.idea
+
+weights
+
+data

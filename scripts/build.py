@@ -23,13 +23,14 @@ def build():
     for _, docker_img in settings.DEEPFIGURES_IMAGES.items():
         tag = docker_img['tag']
         dockerfile_path = docker_img['dockerfile_path']
+        version = docker_img['version_prefix'] + settings.VERSION
 
         execute(
             'docker build'
             ' --tag {tag}:{version}'
             ' --file {dockerfile_path} .'.format(
                 tag=tag,
-                version=settings.VERSION,
+                version=version,
                 dockerfile_path=dockerfile_path),
             logger)
 

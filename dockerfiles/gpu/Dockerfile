@@ -1,8 +1,17 @@
 # docker image for running DeepFigures on a gpu
 
-FROM tensorflow/tensorflow:latest-gpu-py3
+FROM tensorflow/tensorflow:1.14.0-gpu-py3
 
 ENV LC_ALL C.UTF-8
+
+ENV TZ=Europe/Minsk
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+RUN apt-get update
+RUN apt-get install -y libjasper1 libjasper-dev
 
 # install system packages
 
@@ -48,5 +57,12 @@ RUN pip3 install -e /work/vendor/tensorboxresnet
 
 ADD . /work
 RUN pip3 install --quiet -e /work
+
+RUN mkdir ~/.aws
+ADD credentials /work
+RUN cat /work/credentials > ~/.aws/credentials
+
+RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
+RUN pip install imgaug
 
 CMD [ "/bin/bash" ]
