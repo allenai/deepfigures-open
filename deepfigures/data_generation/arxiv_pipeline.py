@@ -6,6 +6,7 @@ import tarfile
 import logging
 import multiprocessing
 import multiprocessing.pool
+from multiprocessing.dummy import Pool as ThreadPool
 import re
 import time
 import functools
@@ -20,11 +21,13 @@ from PIL import Image
 import scipy as sp
 import bs4
 
+import imageio
+import imgaug as ia
+
 from deepfigures import settings
 from deepfigures.utils import file_util, config, settings_utils
 from deepfigures.extraction import figure_utils, renderers
 from deepfigures.extraction.figure_utils import Figure, BoxClass
-
 
 pdf_renderer = settings_utils.import_setting(
     settings.DEEPFIGURES_PDF_RENDERER)()
@@ -82,7 +85,7 @@ def parse_arxiv_tarname(tarname: str) -> Tuple[int, int, int]:
 
 
 def generate_diffs(paper_src_dir: str,
-                   dpi: int=settings.DEFAULT_INFERENCE_DPI) -> Optional[List[str]]:
+                   dpi: int = settings.DEFAULT_INFERENCE_DPI) -> (Optional[List[str]], Optional[List[str]]):
     """
     Given the directory of a latex source file, create a modified copy of the source that includes colored boxes
     surrounding each figure and table.
@@ -147,7 +150,7 @@ def generate_diffs(paper_src_dir: str,
         diff_name = result_dir + 'diff-' + os.path.basename(black_page)
         imsave(diff_name, diff_page)
         diff_names.append(diff_name)
-    return diff_names
+    return diff_names, black_ims
 
 
 CAPTION_LABEL_COLOR = [0, 255, 0]
@@ -291,7 +294,28 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
     return figures
 
 
+def augment_images(image_path, figures) -> Optional[List[Figure]]:
+    image = imageio.imread(image_path)
+    bbs = [ia.BoundingBox(x1=figure.figure_boundary.x1,
+                          y1=figure.figure_boundary.y1,
+                          x2=figure.figure_boundary.x2,
+                          y2=figure.figure_boundary.y2)
+           for figure in figures]
+
+    images_aug, bbs_aug = settings.seq.augment_images([image], [bbs])
+    imageio.imwrite(image_path, images_aug[0])
+    figures_aug = list()
+    for idx, figure in enumerate(figures):
+        bb = bbs_aug[idx]
+        fig = figures[idx]
+        bc = BoxClass(x1=bb.x1, x2=bb.x2, y1=bb.y1, y2=bb.y2)
+        fig.figure_boundary = bc
+        figures_aug.append(fig)
+    return figures_aug
+
+
 def process_paper_tar(paper_tarname: str) -> None:
+    print('processing paper tar {}'.format(paper_tarname))
     parts = paper_tarname.split('/')
     partition_name = parts[-2]
     paper_name = os.path.splitext(parts[-1])[0]
@@ -307,14 +331,16 @@ def process_paper_tar(paper_tarname: str) -> None:
     except tarfile.ReadError:
         logging.debug('File %s is not a tar' % paper_tarname)
         return
-    diffs = generate_diffs(paper_dir)
+    print('generating paper diffs {}'.format(paper_tarname))
+    diffs, black_ims_paths = generate_diffs(paper_dir)
     if diffs is None:
         return
     figures_by_page = dict()
-    for diff in diffs:
+    for idx, diff in enumerate(diffs):
         figures = consume_diff_generate_figures(diff)
         if figures is None:
             continue
+        figures = augment_images(black_ims_paths[idx], figures)
         page_name = os.path.dirname(diff) + '/' + diff[diff.find('black.pdf-'):]
         figures_by_page[page_name] = figures
     file_util.safe_makedirs(os.path.dirname(result_path))
@@ -325,6 +351,18 @@ def process_paper_tar(paper_tarname: str) -> None:
     )
 
 
+def process_paper_tar_with_timeout(paper_tarname: str) -> None:
+    p = ThreadPool(processes=1)
+    result = p.apply_async(process_paper_tar, (paper_tarname,))
+    try:
+        out = result.get(timeout=100)  # Wait timeout seconds for func to complete.
+        return out
+    except multiprocessing.TimeoutError:
+        print("Aborting due to timeout")
+        p.terminate()
+        raise
+
+
 def download_and_extract_tar(
     tarname: str, extract_dir: str, n_attempts: int=100
 ) -> None:
@@ -332,24 +370,27 @@ def download_and_extract_tar(
     logging.info('Downloading %s' % tarname)
     for attempt in range(n_attempts):
         try:
-            cached_file = file_util.cache_file(tarname)
+            cached_file = file_util.cache_file(tarname, cache_dir=settings.ARXIV_DATA_CACHE_DIR)
             break
         except FileNotFoundError:
             if attempt == n_attempts - 1:
                 raise
             logging.exception('Download failed, retrying')
             time.sleep(10)
+    logging.info("Proceeding to extract tar file: {}".format(cached_file))
     file_util.extract_tarfile(cached_file, extract_dir)
-    os.remove(cached_file)
+    #os.remove(cached_file)
 
 
 def run_on_all() -> None:
     Image.MAX_IMAGE_PIXELS = int(1e8)  # Don't render very large PDFs.
     Image.warnings.simplefilter('error', Image.DecompressionBombWarning)
-    tarnames = [
-        tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
-        if os.path.splitext(tarname)[1] == '.tar'
-    ]
+    # tarnames = [
+    #     tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
+    #     if os.path.splitext(tarname)[1] == '.tar'
+    # ]
+    #tarnames = ['s3://arxiv/src/arXiv_src_0001_001.tar', 's3://arxiv/src/arXiv_src_0002_001.tar']
+    tarnames = ["s3://arxiv/src/arXiv_src_0611_001.tar", "s3://arxiv/src/arXiv_src_0611_002.tar"]
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
     grouped_tarnames = figure_utils.ordered_group_by(
@@ -357,26 +398,27 @@ def run_on_all() -> None:
     )
     for group_key, group_tars in grouped_tarnames.items():
         print(datetime.datetime.now())
-        with tempfile.TemporaryDirectory(
-            prefix=settings.ARXIV_DATA_TMP_DIR
-        ) as tmpdir:
-            tmpdir += '/'
-            f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
-            print(
-                'Downloading %d tarfiles in group %s' %
-                (len(group_tars), str(group_key))
-            )
-            with multiprocessing.Pool() as p:
-                p.map(f, group_tars)
-            paper_tarnames = glob.glob(tmpdir + '*/*.gz')
-            print(datetime.datetime.now())
-            print(
-                'Processing %d papers in group %s' %
-                (len(paper_tarnames), str(group_key))
-            )
-            with multiprocessing.Pool(processes=round(2 * os.cpu_count())
-                                     ) as p:
-                p.map(process_paper_tar, paper_tarnames)
+        tmpdir = settings.ARXIV_DATA_TMP_DIR
+        # with tempfile.TemporaryDirectory(
+        #     prefix=settings.ARXIV_DATA_TMP_DIR
+        # ) as tmpdir:
+        # tmpdir += '/'
+        f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
+        print(
+            'Downloading %d tarfiles in group %s' %
+            (len(group_tars), str(group_key))
+        )
+        with multiprocessing.Pool() as p:
+            p.map(f, group_tars)
+        paper_tarnames = glob.glob(os.path.join(tmpdir, '*/*.gz'))
+        print(datetime.datetime.now())
+        print(
+            'Processing %d papers in group %s' %
+            (len(paper_tarnames), str(group_key))
+        )
+        with multiprocessing.Pool(processes=round(1)
+                                  ) as p:
+            p.map(process_paper_tar_with_timeout, paper_tarnames)
 
 
 if __name__ == "__main__":

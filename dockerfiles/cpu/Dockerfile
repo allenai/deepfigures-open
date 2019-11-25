@@ -1,6 +1,6 @@
 # image for running DeepFigures
 
-FROM tensorflow/tensorflow:latest-py3
+FROM tensorflow/tensorflow:1.14.0-py3
 
 ENV LC_ALL C.UTF-8
 
@@ -40,7 +40,8 @@ RUN apt-get clean \
     texlive-latex-base \
     texlive-fonts-recommended \
     texlive-fonts-extra \
-    texlive-latex-extra
+    texlive-latex-extra \
+    texlive-font-utils
 
 WORKDIR /work
 
@@ -59,5 +60,17 @@ ADD . /work
 RUN pip3 install --quiet -e /work
 
 RUN pip3 install Pillow
+
+RUN apt-get install curl
+
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN mkdir ~/.aws
+ADD credentials /work
+RUN cat /work/credentials > ~/.aws/credentials
+RUN apt install -y vim jq
+
+RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
+RUN pip install imgaug
 
 CMD [ "/bin/bash" ]
