@@ -314,6 +314,7 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
 
 
 def process_paper_tar(paper_tarname: str) -> None:
+    print('processing paper tar {}'.format(paper_tarname))
     parts = paper_tarname.split('/')
     partition_name = parts[-2]
     paper_name = os.path.splitext(parts[-1])[0]
@@ -329,6 +330,7 @@ def process_paper_tar(paper_tarname: str) -> None:
     except tarfile.ReadError:
         logging.debug('File %s is not a tar' % paper_tarname)
         return
+    print('generating paper diffs {}'.format(paper_tarname))
     diffs, black_ims_paths = generate_diffs(paper_dir)
     if diffs is None:
         return

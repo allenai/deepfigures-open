@@ -160,10 +160,10 @@ def cache_file(name, cache_dir=None):
     )
     if retcode != 0:
         raise FileNotFoundError('Failed to copy %s' % name)
-    assert os.system(
-        'mv "%s" "%s"' %
-        (target_filename, target_filename)
-    ) == 0
+    # assert os.system(
+    #     'mv "%s" "%s"' %
+    #     (target_filename, target_filename)
+    # ) == 0
     assert os.system('chmod 777 "%s"' % (target_filename)) == 0
     return target_filename
 
