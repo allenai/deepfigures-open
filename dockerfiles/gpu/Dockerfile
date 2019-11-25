@@ -70,5 +70,7 @@ ADD credentials /work
 RUN cat /work/credentials > ~/.aws/credentials
 RUN apt install -y vim jq
 
+RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
+RUN pip install imgaug
 
 CMD [ "/bin/bash" ]

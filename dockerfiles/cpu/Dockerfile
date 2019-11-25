@@ -62,7 +62,7 @@ RUN pip3 install --quiet -e /work
 RUN pip3 install Pillow
 
 RUN apt-get install curl
-#RUN curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+
 RUN unzip awscliv2.zip
 RUN ./aws/install
 RUN mkdir ~/.aws
@@ -70,5 +70,7 @@ ADD credentials /work
 RUN cat /work/credentials > ~/.aws/credentials
 RUN apt install -y vim jq
 
+RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
+RUN pip install imgaug
 
 CMD [ "/bin/bash" ]

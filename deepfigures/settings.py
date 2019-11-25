@@ -3,6 +3,7 @@
 import logging
 import os
 
+from imgaug import augmenters as iaa
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ ARXIV_DATA_TMP_DIR = '/work/host-output/arxiv_data_temp'
 # ARXIV_DATA_TMP_DIR = '/tmp'
 # The location to store the final output labels
 ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
+ARXIV_DATA_CACHE_DIR = '/work/host-output/download_cache'
 
 # The location of the PMC open access data
 PUBMED_INPUT_DIR = ''
@@ -70,3 +72,12 @@ PUBMED_DISTANT_DATA_DIR = ''
 
 # a local directory for storing the output data
 LOCAL_PUBMED_DISTANT_DATA_DIR = ''
+
+seq = iaa.Sequential([
+    iaa.Affine(rotate=(-5, 5)),
+    iaa.AdditiveGaussianNoise(scale=(10, 60)),
+    iaa.SaltAndPepper(0.1),
+    iaa.GaussianBlur(sigma=0.5),
+    iaa.LinearContrast(alpha=1),
+    iaa.PerspectiveTransform(scale=0.025, keep_size=True)
+])
