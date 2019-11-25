@@ -73,7 +73,7 @@ def train(output_directory,
             host_output_path=output_directory,
             docker_output_path=docker_output_directory,
             tag=cpu_docker_img['tag'],
-            version=settings.VERSION,
+            version= cpu_docker_img['version_prefix'] + settings.VERSION,
             hypes_path=hypes),
         logger,
         raise_error=True)
