@@ -8,6 +8,8 @@ from imgaug import augmenters as iaa
 
 logger = logging.getLogger(__name__)
 
+IN_DOCKER = os.environ.get('IN_DOCKER', False)
+
 
 # path to the deepfigures project root
 BASE_DIR = os.path.dirname(
@@ -57,11 +59,18 @@ DEEPFIGURES_PDF_RENDERER = 'deepfigures.extraction.renderers.GhostScriptRenderer
 
 # settings for data generation
 
-# The location to temporarily store arxiv source data
-ARXIV_DATA_TMP_DIR = '/work/host-output/arxiv_data_temp'
-# The location to store the final output labels
-ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
-ARXIV_DATA_CACHE_DIR = '/work/host-output/download_cache'
+if IN_DOCKER:
+    # The location to temporarily store arxiv source data
+    ARXIV_DATA_TMP_DIR = '/work/host-output/arxiv_data_temp'
+    # The location to store the final output labels
+    ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
+    ARXIV_DATA_CACHE_DIR = '/work/host-output/download_cache'
+else:
+    # The location to temporarily store arxiv source data
+    ARXIV_DATA_TMP_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/arxiv_data_temp'
+    # The location to store the final output labels
+    ARXIV_DATA_OUTPUT_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/arxiv_data_output'
+    ARXIV_DATA_CACHE_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/download_cache'
 
 # The location of the PMC open access data
 PUBMED_INPUT_DIR = ''

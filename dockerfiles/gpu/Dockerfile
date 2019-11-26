@@ -65,4 +65,6 @@ RUN cat /work/credentials > ~/.aws/credentials
 RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
 RUN pip install imgaug
 
+ENV IN_DOCKER Yes
+
 CMD [ "/bin/bash" ]
