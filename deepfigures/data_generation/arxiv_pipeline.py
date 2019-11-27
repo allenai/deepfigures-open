@@ -294,13 +294,14 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
 
 
 def augment_images(image_path, figures) -> Optional[List[Figure]]:
+    print("Running augmentation for image: {}".format(image_path))
     image = imageio.imread(image_path)
     bbs = [ia.BoundingBox(x1=figure.figure_boundary.x1,
                           y1=figure.figure_boundary.y1,
                           x2=figure.figure_boundary.x2,
                           y2=figure.figure_boundary.y2)
            for figure in figures]
-
+    print("BBS list size: {}".format(len(bbs)))
     images_aug, bbs_aug = settings.seq.augment_images([image], [bbs])
     imageio.imwrite(image_path, images_aug[0])
     figures_aug = list()
