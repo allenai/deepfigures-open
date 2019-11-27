@@ -310,9 +310,9 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
     imageio.imwrite(image_path, images_aug[0])
     figures_aug = list()
     for idx, figure in enumerate(figures):
-        bb = bbs_aug[idx]
+        bb = bbs_aug[0][idx]
         fig = figures[idx]
-        bc = BoxClass(x1=bb.x1, x2=bb.x2, y1=bb.y1, y2=bb.y2)
+        bc = BoxClass.from_tuple((float(bb.x1), float(bb.x2), float(bb.y1), float(bb.y2)))
         fig.figure_boundary = bc
         figures_aug.append(fig)
     return figures_aug
