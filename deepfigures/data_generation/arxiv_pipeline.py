@@ -294,22 +294,16 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
 
 
 def augment_images(image_path, figures) -> Optional[List[Figure]]:
-    print("Running augmentation for image: {}".format(image_path))
+    # print("Running augmentation for image: {}".format(image_path))
     image = imageio.imread(image_path)
     bbs = [ia.BoundingBox(x1=figure.figure_boundary.x1,
                           y1=figure.figure_boundary.y1,
                           x2=figure.figure_boundary.x2,
                           y2=figure.figure_boundary.y2)
            for figure in figures]
-    print("BBS list size: {}".format(len(bbs)))
-    try:
-        images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
-        print("The basic augmentation operation complete.")
-    except ValueError:
-        print("Caught error! BBS size : {}. ")
-        raise
+    images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
     imageio.imwrite(image_path, images_aug[0])
-    print("Replaced the original image with the augmented image.")
+    # print("Replaced the original image with the augmented image.")
     figures_aug = list()
     for idx, figure in enumerate(figures):
         bb = bbs_aug[0][idx]
@@ -317,7 +311,7 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
         bc = BoxClass.from_tuple((float(bb.x1), float(bb.x2), float(bb.y1), float(bb.y2)))
         fig.figure_boundary = bc
         figures_aug.append(fig)
-    print("Everything in the augmentation function complete.")
+    # print("Everything in the augmentation function complete.")
     return figures_aug
 
 
