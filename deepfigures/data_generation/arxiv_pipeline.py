@@ -304,10 +304,12 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
     print("BBS list size: {}".format(len(bbs)))
     try:
         images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
+        print("The basic augmentation operation complete.")
     except ValueError:
         print("Caught error! BBS size : {}. ")
         raise
     imageio.imwrite(image_path, images_aug[0])
+    print("Replaced the original image with the augmented image.")
     figures_aug = list()
     for idx, figure in enumerate(figures):
         bb = bbs_aug[0][idx]
@@ -315,6 +317,7 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
         bc = BoxClass.from_tuple((float(bb.x1), float(bb.x2), float(bb.y1), float(bb.y2)))
         fig.figure_boundary = bc
         figures_aug.append(fig)
+    print("Everything in the augmentation function complete.")
     return figures_aug
 
 
