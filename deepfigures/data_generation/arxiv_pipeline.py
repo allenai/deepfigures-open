@@ -302,7 +302,11 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
                           y2=figure.figure_boundary.y2)
            for figure in figures]
     print("BBS list size: {}".format(len(bbs)))
-    images_aug, bbs_aug = settings.seq.augment_images([image], [bbs])
+    try:
+        images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
+    except ValueError:
+        print("Caught error! BBS size : {}. ")
+        raise
     imageio.imwrite(image_path, images_aug[0])
     figures_aug = list()
     for idx, figure in enumerate(figures):
