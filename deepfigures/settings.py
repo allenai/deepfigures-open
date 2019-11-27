@@ -90,3 +90,5 @@ seq = iaa.Sequential([
     iaa.LinearContrast(alpha=1),
     iaa.PerspectiveTransform(scale=0.025, keep_size=True)
 ])
+
+PROCESS_PAPER_TAR_THREAD_COUNT = 2 * os.cpu_count()

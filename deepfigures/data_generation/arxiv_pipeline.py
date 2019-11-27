@@ -28,7 +28,6 @@ from deepfigures.utils import file_util, config, settings_utils
 from deepfigures.extraction import figure_utils, renderers
 from deepfigures.extraction.figure_utils import Figure, BoxClass
 
-
 pdf_renderer = settings_utils.import_setting(
     settings.DEEPFIGURES_PDF_RENDERER)()
 
@@ -210,7 +209,7 @@ def get_figure_box(full_box: BoxClass, caption_box: BoxClass,
 
 
 def find_figures_and_captions(
-    diff_im: np.ndarray, im: np.ndarray, page_num: int
+        diff_im: np.ndarray, im: np.ndarray, page_num: int
 ) -> List[Figure]:
     figures = []
     all_box_mask = (
@@ -226,7 +225,7 @@ def find_figures_and_captions(
     for component_id in np.unique(components)[1:]:
         (box_ys, box_xs) = np.where(components == component_id)
         assert (len(box_ys) > 0
-               )  # It was found from np.unique so it must exist somewhere
+                )  # It was found from np.unique so it must exist somewhere
         assert (len(box_xs) > 0)
         full_box = BoxClass(
             x1=float(min(box_xs)),
@@ -280,7 +279,7 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
     dirname = os.path.dirname(diff) + '/'
     pagenum = figure_utils.pagename_to_pagenum(diff)
     page_image_name = dirname + 'black.pdf-images/ghostscript/dpi100/black.pdf-dpi100-page%.04d.png' % (
-        pagenum + 1
+            pagenum + 1
     )
     try:
         page_image = sp.ndimage.imread(page_image_name)
@@ -315,6 +314,7 @@ def augment_images(image_path, figures) -> Optional[List[Figure]]:
 
 
 def process_paper_tar(paper_tarname: str) -> None:
+    print("------Processing paper_tarname : {}--------".format(paper_tarname))
     parts = paper_tarname.split('/')
     partition_name = parts[-2]
     paper_name = os.path.splitext(parts[-1])[0]
@@ -353,7 +353,7 @@ def process_paper_tar(paper_tarname: str) -> None:
 
 
 def download_and_extract_tar(
-    tarname: str, extract_dir: str, n_attempts: int=100
+        tarname: str, extract_dir: str, n_attempts: int = 100
 ) -> None:
     print('.', end='', flush=True)
     logging.info('Downloading %s' % tarname)
@@ -423,8 +423,8 @@ def run_on_all() -> None:
             'Processing %d papers in group %s' %
             (len(paper_tarnames), str(group_key))
         )
-        with multiprocessing.Pool(processes=round(2 * os.cpu_count())
-                                 ) as p:
+        with multiprocessing.Pool(processes=round(settings.PROCESS_PAPER_TAR_THREAD_COUNT)
+                                  ) as p:
             p.map(process_paper_tar, paper_tarnames)
 
 
