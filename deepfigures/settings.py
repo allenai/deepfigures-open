@@ -5,11 +5,9 @@ import os
 
 from imgaug import augmenters as iaa
 
-
 logger = logging.getLogger(__name__)
 
 IN_DOCKER = os.environ.get('IN_DOCKER', False)
-
 
 # path to the deepfigures project root
 BASE_DIR = os.path.dirname(
@@ -56,7 +54,6 @@ PDFFIGURES_JAR_PATH = os.path.join(
 # PDF Rendering backend settings
 DEEPFIGURES_PDF_RENDERER = 'deepfigures.extraction.renderers.GhostScriptRenderer'
 
-
 # settings for data generation
 
 if IN_DOCKER:
@@ -91,4 +88,5 @@ seq = iaa.Sequential([
     iaa.PerspectiveTransform(scale=0.025, keep_size=True)
 ])
 
-PROCESS_PAPER_TAR_THREAD_COUNT = 2 * os.cpu_count()
+# PROCESS_PAPER_TAR_THREAD_COUNT = 2 * os.cpu_count()
+PROCESS_PAPER_TAR_THREAD_COUNT = 1  # just for debugging.
