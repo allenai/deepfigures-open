@@ -15,7 +15,7 @@ for filename in Path(figure_json_path).rglob('*.json'):
     contents = json.load(open(str(filename)))
     for key, value in contents.items():
         dir_name, file = os.path.split(key)
-        correct_path = os.path.join(dir_name, 'black.pdf-images/ghostscript', file)
+        correct_path = os.path.join(dir_name, 'black.pdf-images/ghostscript/dpi100', file)
 
         if not len(value):
             continue
