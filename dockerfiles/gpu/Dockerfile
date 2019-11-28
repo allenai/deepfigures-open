@@ -67,4 +67,8 @@ RUN pip install imgaug
 
 ENV IN_DOCKER Yes
 
+ADD https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/deepfigures/weights.tar.gz /work
+RUN tar -xzf weights.tar.gz
+RUN weights.tar.gz
+
 CMD [ "/bin/bash" ]
