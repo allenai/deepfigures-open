@@ -1,0 +1,62 @@
+{
+    "image_channels": 3,
+    "rnn_len": 1,
+    "later_feat_channels": 832,
+    "early_feat_channels": 256,
+    "biggest_box_px": 10000,
+    "num_lstm_layers": 2,
+    "logging": {
+        "display_iter": 100,
+        "save_iter": 50000
+    },
+    "region_size": 32,
+    "deconv": false,
+    "slim_top_lname": "resnet_v1_101/block4",
+    "lstm_size": 500,
+    "image_height": 640,
+    "save_dir": "",
+    "solver": {
+        "use_jitter": false,
+        "learning_rate_step": 33000,
+        "rnd_seed": 1,
+        "gpu": 1,
+        "learning_rate": 0.001,
+        "hungarian_iou": 0.25,
+        "weights": "/work/weights/save.ckpt-500000.data-00000-of-00001",
+        "opt": "RMS",
+        "head_weights": [
+            1.0,
+            0.1
+        ],
+        "epsilon": 1e-05
+    },
+    "num_classes": 2,
+    "grid_height": 20,
+    "clip_norm": 1.0,
+    "rezoom_w_coords": [
+        -0.25,
+        0.25
+    ],
+    "exp_name": "pmctable_arxiv_combined",
+    "rezoom_h_coords": [
+        -0.25,
+        0.25
+    ],
+    "slim_attention_lname": "resnet_v1_101/block1",
+    "reregress": true,
+    "use_lstm": false,
+    "data": {
+        "truncate_data": false,
+        "test_idl": "/work/host-input/figure_boundaries.json",
+        "train_idl": "/work/host-input/figure_boundaries.json"
+    },
+    "focus_size": 1.8,
+    "rezoom_change_loss": "center",
+    "image_width": 480,
+    "batch_size": 1,
+    "grid_width": 15,
+    "slim_basename": "resnet_v1_101",
+    "avg_pool_size": 5,
+    "slim_ckpt": "",
+    "use_rezoom": true
+}
