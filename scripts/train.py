@@ -59,6 +59,7 @@ def train(output_directory,
 
     execute(
         'docker run'
+        ' --gpus all'
         ' --rm'
         ' --env-file deepfigures-local.env'
         ' --volume {host_input_path}:{docker_input_path}'
