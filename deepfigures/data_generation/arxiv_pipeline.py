@@ -406,24 +406,24 @@ def run_on_all() -> None:
     # ]
     tarnames = [
         "s3://arxiv/src/arXiv_src_0003_001.tar",
-        "s3://arxiv/src/arXiv_src_0306_001.tar"
-        # "s3://arxiv/src/arXiv_src_0508_002.tar",
-        # "s3://arxiv/src/arXiv_src_0611_001.tar",
-        # "s3://arxiv/src/arXiv_src_0611_002.tar",
-        # "s3://arxiv/src/arXiv_src_0704_001.tar",
-        # "s3://arxiv/src/arXiv_src_0807_001.tar",
-        # "s3://arxiv/src/arXiv_src_0904_004.tar",
-        # "s3://arxiv/src/arXiv_src_1001_002.tar",
-        # "s3://arxiv/src/arXiv_src_1008_002.tar",
-        # "s3://arxiv/src/arXiv_src_1012_006.tar",
-        # "s3://arxiv/src/arXiv_src_1106_004.tar",
-        # "s3://arxiv/src/arXiv_src_1110_013.tar",
-        # "s3://arxiv/src/arXiv_src_1203_002.tar",
-        # "s3://arxiv/src/arXiv_src_1207_004.tar",
-        # "s3://arxiv/src/arXiv_src_1207_005.tar",
-        # "s3://arxiv/src/arXiv_src_1210_013.tar",
-        # "s3://arxiv/src/arXiv_src_1302_002.tar",
-        # "s3://arxiv/src/arXiv_src_1305_007.tar"
+        "s3://arxiv/src/arXiv_src_0306_001.tar",
+        "s3://arxiv/src/arXiv_src_0508_002.tar",
+        "s3://arxiv/src/arXiv_src_0611_001.tar",
+        "s3://arxiv/src/arXiv_src_0611_002.tar",
+        "s3://arxiv/src/arXiv_src_0704_001.tar",
+        "s3://arxiv/src/arXiv_src_0807_001.tar",
+        "s3://arxiv/src/arXiv_src_0904_004.tar",
+        "s3://arxiv/src/arXiv_src_1001_002.tar",
+        "s3://arxiv/src/arXiv_src_1008_002.tar",
+        "s3://arxiv/src/arXiv_src_1012_006.tar",
+        "s3://arxiv/src/arXiv_src_1106_004.tar",
+        "s3://arxiv/src/arXiv_src_1110_013.tar",
+        "s3://arxiv/src/arXiv_src_1203_002.tar",
+        "s3://arxiv/src/arXiv_src_1207_004.tar",
+        "s3://arxiv/src/arXiv_src_1207_005.tar",
+        "s3://arxiv/src/arXiv_src_1210_013.tar",
+        "s3://arxiv/src/arXiv_src_1302_002.tar",
+        "s3://arxiv/src/arXiv_src_1305_007.tar"
     ]
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
