@@ -723,6 +723,7 @@ def main():
     H first loads the --hypes hypes.json file and is further updated with
     additional arguments as needed.
     '''
+    print("IS GPU AVAILABLE: {}".format(tf.test.is_gpu_available(cuda_only=False, min_cuda_compute_capability=None)))
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', default=None, type=str)
     parser.add_argument('--gpu', default=None, type=int)
