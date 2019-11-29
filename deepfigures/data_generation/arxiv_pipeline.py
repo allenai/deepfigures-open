@@ -22,6 +22,8 @@ import bs4
 
 import imageio
 import imgaug as ia
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from deepfigures import settings
 from deepfigures.utils import file_util, config, settings_utils
@@ -293,25 +295,45 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
     return figures
 
 
+def plot_bounding_box(image_path, x1, y1, x2, y2):
+    im = np.array(Image.open(image_path), dtype=np.uint8)
+    fig, ax = plt.subplots(1)
+    ax.imshow(im)
+    width = x2 - x1
+    height = y2 - y1
+    rect = patches.Rectangle((x1, y1), width, height, linewidth=1, edgecolor='r', facecolor='none')
+    ax.add_patch(rect)
+    plt.show()
+
+
 def augment_images(image_path, figures) -> Optional[List[Figure]]:
     # print("Running augmentation for image: {}".format(image_path))
+    if len(figures) == 0:
+        return figures
     image = imageio.imread(image_path)
     bbs = [ia.BoundingBox(x1=figure.figure_boundary.x1,
                           y1=figure.figure_boundary.y1,
                           x2=figure.figure_boundary.x2,
                           y2=figure.figure_boundary.y2)
            for figure in figures]
+    # figg = figures[0]
+    # plot_bounding_box(image_path, x1=figg.figure_boundary.x1, y1=figg.figure_boundary.y1,
+    #                   x2=figg.figure_boundary.x2, y2=figg.figure_boundary.y2)
     images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
     imageio.imwrite(image_path, images_aug[0])
+    # plot_bounding_box(image_path, x1=bbs_aug[0][0].x1, y1=bbs_aug[0][0].y1,
+    #                   x2=bbs_aug[0][0].x2, y2=bbs_aug[0][0].y2)
     # print("Replaced the original image with the augmented image.")
     figures_aug = list()
     for idx, figure in enumerate(figures):
         bb = bbs_aug[0][idx]
         fig = figures[idx]
-        bc = BoxClass.from_tuple((float(bb.x1), float(bb.x2), float(bb.y1), float(bb.y2)))
+        bc = BoxClass.from_tuple((float(bb.x1), float(bb.y1), float(bb.x2), float(bb.y2)))
         fig.figure_boundary = bc
         figures_aug.append(fig)
     # print("Everything in the augmentation function complete.")
+    # plot_bounding_box(image_path, x1=figures_aug[0].figure_boundary.x1, y1=figures_aug[0].figure_boundary.y1,
+    #                   x2=figures_aug[0].figure_boundary.x2, y2=figures_aug[0].figure_boundary.y2)
     return figures_aug
 
 
@@ -343,7 +365,10 @@ def process_paper_tar(paper_tarname: str) -> None:
         figures = consume_diff_generate_figures(diff)
         if figures is None:
             continue
-        figures = augment_images(black_ims_paths[idx], figures)
+        try:
+            figures = augment_images(black_ims_paths[idx], figures)
+        except Exception as e:
+            print("Error augmenting images for image path: {}. Exception message: {}".format(black_ims_paths[idx], e))
         page_name = os.path.dirname(diff) + '/' + diff[diff.find('black.pdf-'):]
         figures_by_page[page_name] = figures
     file_util.safe_makedirs(os.path.dirname(result_path))
@@ -381,24 +406,24 @@ def run_on_all() -> None:
     # ]
     tarnames = [
         "s3://arxiv/src/arXiv_src_0003_001.tar",
-        "s3://arxiv/src/arXiv_src_0306_001.tar",
-        "s3://arxiv/src/arXiv_src_0508_002.tar",
-        "s3://arxiv/src/arXiv_src_0611_001.tar",
-        "s3://arxiv/src/arXiv_src_0611_002.tar",
-        "s3://arxiv/src/arXiv_src_0704_001.tar",
-        "s3://arxiv/src/arXiv_src_0807_001.tar",
-        "s3://arxiv/src/arXiv_src_0904_004.tar",
-        "s3://arxiv/src/arXiv_src_1001_002.tar",
-        "s3://arxiv/src/arXiv_src_1008_002.tar",
-        "s3://arxiv/src/arXiv_src_1012_006.tar",
-        "s3://arxiv/src/arXiv_src_1106_004.tar",
-        "s3://arxiv/src/arXiv_src_1110_013.tar",
-        "s3://arxiv/src/arXiv_src_1203_002.tar",
-        "s3://arxiv/src/arXiv_src_1207_004.tar",
-        "s3://arxiv/src/arXiv_src_1207_005.tar",
-        "s3://arxiv/src/arXiv_src_1210_013.tar",
-        "s3://arxiv/src/arXiv_src_1302_002.tar",
-        "s3://arxiv/src/arXiv_src_1305_007.tar"
+        "s3://arxiv/src/arXiv_src_0306_001.tar"
+        # "s3://arxiv/src/arXiv_src_0508_002.tar",
+        # "s3://arxiv/src/arXiv_src_0611_001.tar",
+        # "s3://arxiv/src/arXiv_src_0611_002.tar",
+        # "s3://arxiv/src/arXiv_src_0704_001.tar",
+        # "s3://arxiv/src/arXiv_src_0807_001.tar",
+        # "s3://arxiv/src/arXiv_src_0904_004.tar",
+        # "s3://arxiv/src/arXiv_src_1001_002.tar",
+        # "s3://arxiv/src/arXiv_src_1008_002.tar",
+        # "s3://arxiv/src/arXiv_src_1012_006.tar",
+        # "s3://arxiv/src/arXiv_src_1106_004.tar",
+        # "s3://arxiv/src/arXiv_src_1110_013.tar",
+        # "s3://arxiv/src/arXiv_src_1203_002.tar",
+        # "s3://arxiv/src/arXiv_src_1207_004.tar",
+        # "s3://arxiv/src/arXiv_src_1207_005.tar",
+        # "s3://arxiv/src/arXiv_src_1210_013.tar",
+        # "s3://arxiv/src/arXiv_src_1302_002.tar",
+        # "s3://arxiv/src/arXiv_src_1305_007.tar"
     ]
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever

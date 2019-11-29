@@ -62,12 +62,16 @@ if IN_DOCKER:
     # The location to store the final output labels
     ARXIV_DATA_OUTPUT_DIR = '/work/host-output/arxiv_data_output'
     ARXIV_DATA_CACHE_DIR = '/work/host-output/download_cache'
+    # Higher parallelism on docker.
+    PROCESS_PAPER_TAR_THREAD_COUNT = 2 * os.cpu_count()
 else:
     # The location to temporarily store arxiv source data
     ARXIV_DATA_TMP_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/arxiv_data_temp'
     # The location to store the final output labels
     ARXIV_DATA_OUTPUT_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/arxiv_data_output'
     ARXIV_DATA_CACHE_DIR = '/home/sampanna/workspace/bdts2/deepfigures-results/download_cache'
+    # Lower parallelism on local for simpler debugging.
+    PROCESS_PAPER_TAR_THREAD_COUNT = 1
 
 # The location of the PMC open access data
 PUBMED_INPUT_DIR = ''
@@ -87,5 +91,3 @@ seq = iaa.Sequential([
     iaa.LinearContrast(alpha=1),
     iaa.PerspectiveTransform(scale=0.025, keep_size=True)
 ])
-
-PROCESS_PAPER_TAR_THREAD_COUNT = 2 * os.cpu_count()
