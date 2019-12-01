@@ -45,7 +45,14 @@ IMPORT_STR = r'''
 \floatsetup[table]{framestyle=colorbox, colorframeset=tablecolorbox, framearound=all, frameset={\fboxrule1pt\fboxsep0pt}}
 
 \usepackage[labelfont={color=%s},textfont={color=%s}]{caption}
+
+\renewcommand\ttdefault{cmvtt}
+\renewcommand{\familydefault}{\ttdefault}
+\linespread{1.5}
+
 '''
+
+DOC_CLASS_REGEX = r'\\documentclass\[(.*?)\]\{(.*?)\}'
 
 BEGIN_DOC = r'\begin{document}'
 COLOR_STR = (IMPORT_STR % ('red', 'yellow', 'green', 'blue')) + BEGIN_DOC
@@ -73,6 +80,22 @@ ARXIV_TAR_RE = re.compile(
 ARXIV_TAR_TEMPLATE = ARXIV_TAR_SRC + 'arXiv_src_%02d%02d_%03d.tar'
 
 PDFLATEX_TIMEOUT = 120
+
+
+def doc_class_replace(match_result):
+    group1 = match_result.regs[1]
+    group2 = match_result.regs[2]
+
+    group1Text = match_result.string[group1[0]: group1[1]]
+    group2Text = match_result.string[group2[0]: group2[1]]
+    print(group1Text, group2Text)
+    if '12pt' not in group1Text:
+        group1Text = group1Text + ',12pt'
+    return '\documentclass[' + group1Text + ']{' + group2Text + '}'
+
+
+def make_12_pt(input_text):
+    return re.sub(DOC_CLASS_REGEX, doc_class_replace, input_text)
 
 
 def parse_arxiv_tarname(tarname: str) -> Tuple[int, int, int]:
@@ -112,6 +135,7 @@ def generate_diffs(paper_src_dir: str,
         os.makedirs(paper_modified_src_dir)
     color_filename = paper_modified_src_dir + '/color.tex'
     black_filename = paper_modified_src_dir + '/black.tex'
+    text = make_12_pt(text)
     with open(color_filename, 'w') as f:
         print(text.replace(BEGIN_DOC, COLOR_STR), file=f)
     with open(black_filename, 'w') as f:
