@@ -5,14 +5,19 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-def plot_bounding_box(image_path, x1, y1, x2, y2):
+def plot_bbs(image_path: str, bbs):
+    if not bbs:
+        return
+
     im = np.array(Image.open(image_path), dtype=np.uint8)
     fig, ax = plt.subplots(1)
     ax.imshow(im)
-    width = x2 - x1
-    height = y2 - y1
-    rect = patches.Rectangle((x1, y1), width, height, linewidth=1, edgecolor='r', facecolor='none')
-    ax.add_patch(rect)
+
+    for bb in bbs:
+        x1, y1, x2, y2 = bb['x1'], bb['y1'], bb['x2'], bb['y2']
+        rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='g', facecolor='none')
+        ax.add_patch(rect)
+
     plt.show()
 
 
@@ -46,5 +51,4 @@ if __name__ == "__main__":
     for figure_path in figure_paths:
         fig_idx = int(figure_path.split('-')[-1].split('.png')[0].split('page')[1]) - 1
         page_bbs = result_json['raw_detected_boxes'][fig_idx]
-        for bb in page_bbs:
-            plot_bounding_box(figure_path, x1=bb['x1'], y1=bb['y1'], x2=bb['x2'], y2=bb['y2'])
+        plot_bbs(figure_path, page_bbs)
