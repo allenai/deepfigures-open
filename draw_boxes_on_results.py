@@ -19,7 +19,7 @@ def plot_bounding_box(image_path, x1, y1, x2, y2):
 def obtain_figure_paths(result_dir):
     pdf_path = glob.glob(os.path.join(result_dir, '*.pdf'))[0]
     pdf_name = os.path.split(pdf_path)[1].split('.pdf')[0]
-    figure_dir = os.path.join(result_dir, pdf_name + '.pdf-images', 'ghostscript', 'dpi200')
+    figure_dir = os.path.join(result_dir, pdf_name + '.pdf-images', 'ghostscript', 'dpi100')
     figure_paths_ = glob.glob(os.path.join(figure_dir, '*.png'))
     figure_paths_.sort()
     return figure_paths_
