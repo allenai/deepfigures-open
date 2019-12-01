@@ -42,7 +42,7 @@ def generatepubmed(skip_dependencies=True):
         ' python3'
         ' /work/deepfigures/data_generation/pubmed_pipeline.py'.format(
             tag=cpu_docker_img['tag'],
-            version=settings.VERSION,
+            version=cpu_docker_img['version_prefix'] + settings.VERSION,
             LOCAL_PUBMED_DISTANT_DATA_DIR=settings.LOCAL_PUBMED_DISTANT_DATA_DIR),
         logger,
         raise_error=True)

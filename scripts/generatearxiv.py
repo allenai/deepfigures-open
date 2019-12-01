@@ -47,7 +47,7 @@ def generatearxiv(skip_dependencies=True):
         ' python3'
         ' /work/deepfigures/data_generation/arxiv_pipeline.py'.format(
             tag=cpu_docker_img['tag'],
-            version=settings.VERSION,
+            version=cpu_docker_img['version_prefix'] + settings.VERSION,
             ARXIV_DATA_TMP_DIR=settings.ARXIV_DATA_TMP_DIR,
             ARXIV_DATA_OUTPUT_DIR=settings.ARXIV_DATA_OUTPUT_DIR),
         logger,
