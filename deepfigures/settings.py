@@ -45,7 +45,7 @@ TENSORBOX_MODEL = {
 }
 
 # paths to binary dependencies
-PDFFIGURES_JAR_NAME = 'pdffigures2-assembly-0.0.12-SNAPSHOT.jar'
+PDFFIGURES_JAR_NAME = 'pdffigures2-assembly-0.1.0.jar'
 PDFFIGURES_JAR_PATH = os.path.join(
     BASE_DIR,
     'bin/',
