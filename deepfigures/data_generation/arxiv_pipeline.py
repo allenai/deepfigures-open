@@ -428,26 +428,62 @@ def run_on_all() -> None:
     #     tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
     #     if os.path.splitext(tarname)[1] == '.tar'
     # ]
+    # import json
+    # import random
+    # all_tarnames = json.load(open('all_tarnames.json'))
+    # tarnames = random.choices(all_tarnames, k=31)
+    # print(tarnames)
     tarnames = [
         "s3://arxiv/src/arXiv_src_0003_001.tar",
+        "s3://arxiv/src/arXiv_src_0104_001.tar",
         "s3://arxiv/src/arXiv_src_0306_001.tar",
         "s3://arxiv/src/arXiv_src_0508_002.tar",
         "s3://arxiv/src/arXiv_src_0611_001.tar",
         "s3://arxiv/src/arXiv_src_0611_002.tar",
         "s3://arxiv/src/arXiv_src_0704_001.tar",
         "s3://arxiv/src/arXiv_src_0807_001.tar",
+        "s3://arxiv/src/arXiv_src_0812_004.tar",
+        "s3://arxiv/src/arXiv_src_0901_001.tar",
+        "s3://arxiv/src/arXiv_src_0903_005.tar",
         "s3://arxiv/src/arXiv_src_0904_004.tar",
         "s3://arxiv/src/arXiv_src_1001_002.tar",
+        "s3://arxiv/src/arXiv_src_1004_006.tar",
         "s3://arxiv/src/arXiv_src_1008_002.tar",
         "s3://arxiv/src/arXiv_src_1012_006.tar",
+        "s3://arxiv/src/arXiv_src_1103_006.tar",
         "s3://arxiv/src/arXiv_src_1106_004.tar",
+        "s3://arxiv/src/arXiv_src_1110_005.tar",
+        "s3://arxiv/src/arXiv_src_1110_008.tar",
         "s3://arxiv/src/arXiv_src_1110_013.tar",
         "s3://arxiv/src/arXiv_src_1203_002.tar",
+        "s3://arxiv/src/arXiv_src_1206_001.tar",
         "s3://arxiv/src/arXiv_src_1207_004.tar",
         "s3://arxiv/src/arXiv_src_1207_005.tar",
+        "s3://arxiv/src/arXiv_src_1208_003.tar",
         "s3://arxiv/src/arXiv_src_1210_013.tar",
+        "s3://arxiv/src/arXiv_src_1212_010.tar",
         "s3://arxiv/src/arXiv_src_1302_002.tar",
-        "s3://arxiv/src/arXiv_src_1305_007.tar"
+        "s3://arxiv/src/arXiv_src_1305_007.tar",
+        "s3://arxiv/src/arXiv_src_1308_004.tar",
+        "s3://arxiv/src/arXiv_src_1309_009.tar",
+        "s3://arxiv/src/arXiv_src_1310_019.tar",
+        "s3://arxiv/src/arXiv_src_1405_013.tar",
+        "s3://arxiv/src/arXiv_src_1411_014.tar",
+        "s3://arxiv/src/arXiv_src_1508_004.tar",
+        "s3://arxiv/src/arXiv_src_1611_022.tar",
+        "s3://arxiv/src/arXiv_src_1612_010.tar",
+        "s3://arxiv/src/arXiv_src_1702_006.tar",
+        "s3://arxiv/src/arXiv_src_1703_008.tar",
+        "s3://arxiv/src/arXiv_src_1706_021.tar",
+        "s3://arxiv/src/arXiv_src_1806_001.tar",
+        "s3://arxiv/src/arXiv_src_1807_007.tar",
+        "s3://arxiv/src/arXiv_src_1808_009.tar",
+        "s3://arxiv/src/arXiv_src_1808_030.tar",
+        "s3://arxiv/src/arXiv_src_1810_020.tar",
+        "s3://arxiv/src/arXiv_src_1909_026.tar",
+        "s3://arxiv/src/arXiv_src_1910_015.tar",
+        "s3://arxiv/src/arXiv_src_9601_001.tar",
+        "s3://arxiv/src/arXiv_src_1910_022.tar"
     ]
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
