@@ -386,7 +386,7 @@ def download_and_extract_tar(
     logging.info('Downloading %s' % tarname)
     for attempt in range(n_attempts):
         try:
-            cached_file = file_util.cache_file(tarname, cache_dir=settings.ARXIV_DATA_CACHE_DIR)
+            cached_file = file_util.cache_file_2(tarname, cache_dir=settings.ARXIV_DATA_CACHE_DIR)
             break
         except FileNotFoundError:
             if attempt == n_attempts - 1:
