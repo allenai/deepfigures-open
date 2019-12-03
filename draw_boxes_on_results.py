@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-def plot_bbs(image_path: str, bbs):
+def plot_bbs(image_path: str, bbs, save_fig=False):
     if not bbs:
         return
 
@@ -18,6 +18,8 @@ def plot_bbs(image_path: str, bbs):
         rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1, edgecolor='g', facecolor='none')
         ax.add_patch(rect)
 
+    if save_fig:
+        plt.savefig(image_path.split('.png')[0] + '_bb.png')
     plt.show()
 
 
@@ -25,7 +27,7 @@ def obtain_figure_paths(result_dir):
     pdf_path = glob.glob(os.path.join(result_dir, '*.pdf'))[0]
     pdf_name = os.path.split(pdf_path)[1].split('.pdf')[0]
     figure_dir = os.path.join(result_dir, pdf_name + '.pdf-images', 'ghostscript', 'dpi100')
-    figure_paths_ = glob.glob(os.path.join(figure_dir, '*.png'))
+    figure_paths_ = glob.glob(os.path.join(figure_dir, '*[!(_bb)].png'))
     figure_paths_.sort()
     return figure_paths_
 
@@ -51,4 +53,4 @@ if __name__ == "__main__":
     for figure_path in figure_paths:
         fig_idx = int(figure_path.split('-')[-1].split('.png')[0].split('page')[1]) - 1
         page_bbs = result_json['raw_detected_boxes'][fig_idx]
-        plot_bbs(figure_path, page_bbs)
+        plot_bbs(figure_path, page_bbs, save_fig=False)
