@@ -10,7 +10,6 @@ import click
 from deepfigures import settings
 from scripts import execute
 
-
 logger = logging.getLogger(__name__)
 
 

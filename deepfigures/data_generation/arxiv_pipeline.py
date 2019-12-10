@@ -6,6 +6,7 @@ import tarfile
 import logging
 import multiprocessing
 import multiprocessing.pool
+from multiprocessing.dummy import Pool as ThreadPool
 import re
 import time
 import functools
@@ -403,6 +404,18 @@ def process_paper_tar(paper_tarname: str) -> None:
     )
 
 
+def process_paper_tar_with_timeout(paper_tarname: str) -> None:
+    p = ThreadPool(processes=1)
+    result = p.apply_async(process_paper_tar, (paper_tarname,))
+    try:
+        out = result.get(timeout=100)  # Wait timeout seconds for func to complete.
+        return out
+    except multiprocessing.TimeoutError:
+        print("Aborting due to timeout")
+        p.terminate()
+        raise
+
+
 def download_and_extract_tar(
         tarname: str, extract_dir: str, n_attempts: int = 100
 ) -> None:
@@ -417,6 +430,7 @@ def download_and_extract_tar(
                 raise
             logging.exception('Download failed, retrying')
             time.sleep(10)
+    logging.info("Proceeding to extract tar file: {}".format(cached_file))
     file_util.extract_tarfile(cached_file, extract_dir)
     # os.remove(cached_file)
 
