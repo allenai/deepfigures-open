@@ -3,7 +3,11 @@ The master branch of the original repository was not working for me. So I debugg
 
 #### Made changes to the ```Dockerfile```s.
 
-Docker-file was not building (both cpu and gpu). There was some error related to 'libjasper1 libjasper-dev not found'. Hence, added corresponding changes to the Dockerfile to make them buildable. Have also pushed the built images to Docker Hub. Link [here][docker-hub-link]. You can simply fetch the two images and re-tag them as ```deepfigures-cpu:0.0.1``` and ```deepfigures-gpu:0.0.1```. 
+Docker-file was not building (both cpu and gpu). 
+There was some error related to 'libjasper1 libjasper-dev not found'. 
+Hence, added corresponding changes to the Dockerfile to make them buildable. 
+Have also pushed the built images to Docker Hub. Link [here][docker-hub-link]. 
+You can simply fetch the two images and re-tag them as ```deepfigures-cpu:0.0.5``` and ```deepfigures-gpu:0.0.5```. 
 Further, added the functionality to make read AWS credentials from the ./credentials file. 
     
 #### Added the pre-built pdffigures jar.
@@ -21,38 +25,81 @@ Imported it separately using ```from scipy import optimize``` and started using 
 
 ## Instruction to run this fork:
 
-#### If you need you need to download data from AWS, please add your credentials to the ```credentials``` file. A sample of this file should look like:
+#### Create python environment
+Use the ``requirements.txt`` from the repository's root to create your python environment.
+
+#### Install deepfigures package
+Activate the above-created python environment, ``cd`` to the project's root directory and run the following to install the deepfigures package:
+```shell script
+python setup.py install
+```
+This will install the deepfigures python package in the current environment which will make our code work.
+
+#### Set AWS credentials. 
+If you need you need to download data from AWS, please add your credentials to the ```credentials``` file.
+A sample of this file should look like:
 ```ini
 [default]
-aws_access_key_id=ASIAVO4VWF5FN5KTTA4U
-aws_secret_access_key=lmKHjyetPZ7B5r39IQLugFUXcm4o9CpRH5SaYW7Y
-aws_session_token=FwoGZXIvYXdzENn//////////wEaDE6mcdTuloJ8OKmwdCK+ATwqJeex8U/2iSt/kXBN+4n2H9H6LT3s0aUaMA/I7CBkyxwSMRmRJPCjH7s7+D4zSxLzjPVyOh6oXgMHtB+Clu9qK0spVA579TLiIv/WwKte0/7O4olT08a/1cpoR3pbvulbs+j7+UrJ7HfPx29xQ6vnzYq3b/9lWtwtCPiQsGC/cxfN4zEx677UiwGFFGccCM2SZT4+WWLkX1Ka7+NAsdEeYxatYGsDHyp+1TRz2PczZA5xUWnxV9Cv0pfUTJ4o3ufa7gUyLenIKDet0XWA0GnU/9yXQm6bllf6xBPYzbrQ+mV/2NmU20dIuyS1IyfP3XV4fg==
+aws_access_key_id=dummy_sample_credentials
+aws_secret_access_key=dummy_sample_credentials_dummy_sample_credentials
+aws_session_token=dummy_sample_credentials_dummy_sample_credentials_dummy_sample_credentials_dummy_sample_credentials_dummy_sample_credentials_dummy_sample_credentials_dummy_sample_credentials_
 ```
 
 Also, don't forget to set the ARXIV_DATA_TMP_DIR and ARXIV_DATA_OUTPUT_DIR variables as mentioned in the ```README.md```.
 
-#### Pull the compiled docker image:
+#### Test the pre-built Docker image:
 ```shell script
-sudo docker pull sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.1
+sudo docker run --gpus all -it --volume /home/sampanna/deepfigures-results:/work/host-output --volume /home/sampanna/deepfigures-results/31219:/work/host-input sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.5 /bin/bash
 ```
+This command will pull the ``sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.5`` docker image from Docker Hub, run it and give us bash access to it.
+If this image is already pulled, this command will simply run it.
+``sampyash/vt_cs_6604_digital_libraries:deepfigures_cpu_0.0.5`` is also available for CPU use-cases.
 
-#### ssh into the pulled image by running it:
+Note: Please check the latest version before pulling.
+
+In the above command, the first '--volume' argument connects the local output directory with the docker output directory.
+The second '--volume' argument does the same for the input directory.
+Please modify the local file paths as per your local host system.
+More info [here][docker-commandline-run-docs].
+
+Further, the ``--gpus all`` option tells docker to use all the GPUs available on the system.
+Try running ``nvidia-smi`` once inside the container to check if GPUs are accessible. 
+The ``--gpus all`` option is not required when running the CPU docker image.
+
+#### Generate data:
 ```shell script
-sudo docker run -it --volume /home/sampanna/deepfigures-results:/work/host-output --volume /home/sampanna/deepfigures-results/31219:/work/host-input sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.1 /bin/bash
+docker run --gpus all -it --volume /home/sampanna/deepfigures-results:/work/host-output --volume /home/sampanna/deepfigures-results:/work/host-input sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.5 python deepfigures/data_generation/arxiv_pipeline.py
 ```
-Here, the first '--volume' argument connects the local output directory with the docker output directory. The second '--volume' argument does the same for the input directory. Please modify the local file paths as per your local host system.
+This command will run the ``deepfigures/data_generation/arxiv_pipeline.py`` script from the source code which will:
+- Download data from AWS's requester-pays buckets using the credentials set above.
+- Cache this data in the directory ``/work/host-output/download_cache``.
+- Unzip and generate the relevant training data.
 
-#### Execute the desired commands:
+#### Transform data:
 ```shell script
-python vendor/tensorboxresnet/tensorboxresnet/train.py --hypes weights/hypes.json --gpu 0 --logdir host-output
+docker run --gpus all -it --volume /home/sampanna/deepfigures-results:/work/host-output --volume /home/sampanna/deepfigures-results:/work/host-input sampyash/vt_cs_6604_digital_libraries:deepfigures_cpu_0.0.5 python figure_json_transformer.py
 ```
-Once inside the docker environment, use the bash access to run any required commands. For example, the above command starts training.
+The data generated by the ``arxiv_pipeline.py`` is not in the format needed by ``tensorbox`` for training.
+Hence, this command will trainsform it.
 
-Another example:
-
-This command runs the pipeline to download the data. Run it from /work directory.
+#### Train the model:
 ```shell script
-python ./deepfigures/data_generation/arxiv_pipeline.py
+python manage.py train /work/host-input/weights/hypes.json /home/sampanna/deepfigures-results /home/sampanna/deepfigures-results
 ```
+Here, the python environment created in one of the steps above should be activated.
+- The first argument to ``manage.py`` is the ``train`` command.
+- ``/work/host-input/weights/hypes.json`` is the path to the hyper-parameters as visible from inside the docker container.
+- ``/home/sampanna/deepfigures-results`` is the host's input directory for the container. This will be linked to ``/work/host-input``.
+- ``/home/sampanna/deepfigures-results`` is the host's output directory for the container. This will be linked to ``/work/host-output``.
+
+#### Run detection:
+```shell script
+python manage.py detectfigures '/home/sampanna/workspace/bdts2/deepfigures-results' '/home/sampanna/workspace/bdts2/deepfigures-results/LD5655.V855_1935.C555.pdf'
+```
+Here, the python environment created in one of the steps above should be activated.
+- The first argument to ``manage.py`` is the ``detectfigures`` command.
+- ``'/home/sampanna/workspace/bdts2/deepfigures-results'`` is the host path to the output directory to put the detection results in.
+- ``'/home/sampanna/workspace/bdts2/deepfigures-results/LD5655.V855_1935.C555.pdf'`` is the host path to the PDF file to be processes.
 
 [docker-hub-link]: https://hub.docker.com/r/sampyash/vt_cs_6604_digital_libraries/tags
+[docker-commandline-run-docs]: https://docs.docker.com/engine/reference/commandline/run
