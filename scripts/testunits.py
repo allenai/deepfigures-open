@@ -39,7 +39,7 @@ def testunits(skip_dependencies=False):
         ' {tag}:{version}'
         ' python3 /work/scripts/runtests.py'.format(
             tag=cpu_docker_img['tag'],
-            version=settings.VERSION),
+            version=cpu_docker_img['version_prefix'] + settings.VERSION),
         logger,
         raise_error=True)
 

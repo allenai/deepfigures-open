@@ -69,7 +69,7 @@ def detectfigures(
         '   {internal_output_directory}'
         '   {internal_pdf_path}'.format(
             tag=cpu_docker_img['tag'],
-            version=settings.VERSION,
+            version=cpu_docker_img['version_prefix'] + settings.VERSION,
             output_directory=output_directory,
             internal_output_directory=internal_output_directory,
             pdf_directory=pdf_directory,

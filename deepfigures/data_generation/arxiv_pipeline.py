@@ -23,6 +23,8 @@ import bs4
 
 import imageio
 import imgaug as ia
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 from deepfigures import settings
 from deepfigures.utils import file_util, config, settings_utils
@@ -44,7 +46,14 @@ IMPORT_STR = r'''
 \floatsetup[table]{framestyle=colorbox, colorframeset=tablecolorbox, framearound=all, frameset={\fboxrule1pt\fboxsep0pt}}
 
 \usepackage[labelfont={color=%s},textfont={color=%s}]{caption}
+
+\renewcommand\ttdefault{cmvtt}
+\renewcommand{\familydefault}{\ttdefault}
+\linespread{1.5}
+
 '''
+
+DOC_CLASS_REGEX = r'\\documentclass\[(.*?)\]\{(.*?)\}'
 
 BEGIN_DOC = r'\begin{document}'
 COLOR_STR = (IMPORT_STR % ('red', 'yellow', 'green', 'blue')) + BEGIN_DOC
@@ -72,6 +81,22 @@ ARXIV_TAR_RE = re.compile(
 ARXIV_TAR_TEMPLATE = ARXIV_TAR_SRC + 'arXiv_src_%02d%02d_%03d.tar'
 
 PDFLATEX_TIMEOUT = 120
+
+
+def doc_class_replace(match_result):
+    group1 = match_result.regs[1]
+    group2 = match_result.regs[2]
+
+    group1Text = match_result.string[group1[0]: group1[1]]
+    group2Text = match_result.string[group2[0]: group2[1]]
+    print(group1Text, group2Text)
+    if '12pt' not in group1Text:
+        group1Text = group1Text + ',12pt'
+    return '\documentclass[' + group1Text + ']{' + group2Text + '}'
+
+
+def make_12_pt(input_text):
+    return re.sub(DOC_CLASS_REGEX, doc_class_replace, input_text)
 
 
 def parse_arxiv_tarname(tarname: str) -> Tuple[int, int, int]:
@@ -111,6 +136,7 @@ def generate_diffs(paper_src_dir: str,
         os.makedirs(paper_modified_src_dir)
     color_filename = paper_modified_src_dir + '/color.tex'
     black_filename = paper_modified_src_dir + '/black.tex'
+    text = make_12_pt(text)
     with open(color_filename, 'w') as f:
         print(text.replace(BEGIN_DOC, COLOR_STR), file=f)
     with open(black_filename, 'w') as f:
@@ -210,7 +236,7 @@ def get_figure_box(full_box: BoxClass, caption_box: BoxClass,
 
 
 def find_figures_and_captions(
-    diff_im: np.ndarray, im: np.ndarray, page_num: int
+        diff_im: np.ndarray, im: np.ndarray, page_num: int
 ) -> List[Figure]:
     figures = []
     all_box_mask = (
@@ -226,7 +252,7 @@ def find_figures_and_captions(
     for component_id in np.unique(components)[1:]:
         (box_ys, box_xs) = np.where(components == component_id)
         assert (len(box_ys) > 0
-               )  # It was found from np.unique so it must exist somewhere
+                )  # It was found from np.unique so it must exist somewhere
         assert (len(box_xs) > 0)
         full_box = BoxClass(
             x1=float(min(box_xs)),
@@ -280,7 +306,7 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
     dirname = os.path.dirname(diff) + '/'
     pagenum = figure_utils.pagename_to_pagenum(diff)
     page_image_name = dirname + 'black.pdf-images/ghostscript/dpi100/black.pdf-dpi100-page%.04d.png' % (
-        pagenum + 1
+            pagenum + 1
     )
     try:
         page_image = sp.ndimage.imread(page_image_name)
@@ -294,28 +320,50 @@ def consume_diff_generate_figures(diff) -> Optional[List[Figure]]:
     return figures
 
 
+def plot_bounding_box(image_path, x1, y1, x2, y2):
+    im = np.array(Image.open(image_path), dtype=np.uint8)
+    fig, ax = plt.subplots(1)
+    ax.imshow(im)
+    width = x2 - x1
+    height = y2 - y1
+    rect = patches.Rectangle((x1, y1), width, height, linewidth=1, edgecolor='r', facecolor='none')
+    ax.add_patch(rect)
+    plt.show()
+
+
 def augment_images(image_path, figures) -> Optional[List[Figure]]:
+    # print("Running augmentation for image: {}".format(image_path))
+    if len(figures) == 0:
+        return figures
     image = imageio.imread(image_path)
     bbs = [ia.BoundingBox(x1=figure.figure_boundary.x1,
                           y1=figure.figure_boundary.y1,
                           x2=figure.figure_boundary.x2,
                           y2=figure.figure_boundary.y2)
            for figure in figures]
-
-    images_aug, bbs_aug = settings.seq.augment_images([image], [bbs])
+    # figg = figures[0]
+    # plot_bounding_box(image_path, x1=figg.figure_boundary.x1, y1=figg.figure_boundary.y1,
+    #                   x2=figg.figure_boundary.x2, y2=figg.figure_boundary.y2)
+    images_aug, bbs_aug = settings.seq(images=[image], bounding_boxes=[bbs])
     imageio.imwrite(image_path, images_aug[0])
+    # plot_bounding_box(image_path, x1=bbs_aug[0][0].x1, y1=bbs_aug[0][0].y1,
+    #                   x2=bbs_aug[0][0].x2, y2=bbs_aug[0][0].y2)
+    # print("Replaced the original image with the augmented image.")
     figures_aug = list()
     for idx, figure in enumerate(figures):
-        bb = bbs_aug[idx]
+        bb = bbs_aug[0][idx]
         fig = figures[idx]
-        bc = BoxClass(x1=bb.x1, x2=bb.x2, y1=bb.y1, y2=bb.y2)
+        bc = BoxClass.from_tuple((float(bb.x1), float(bb.y1), float(bb.x2), float(bb.y2)))
         fig.figure_boundary = bc
         figures_aug.append(fig)
+    # print("Everything in the augmentation function complete.")
+    # plot_bounding_box(image_path, x1=figures_aug[0].figure_boundary.x1, y1=figures_aug[0].figure_boundary.y1,
+    #                   x2=figures_aug[0].figure_boundary.x2, y2=figures_aug[0].figure_boundary.y2)
     return figures_aug
 
 
 def process_paper_tar(paper_tarname: str) -> None:
-    print('processing paper tar {}'.format(paper_tarname))
+    print("------Processing paper_tarname : {}--------".format(paper_tarname))
     parts = paper_tarname.split('/')
     partition_name = parts[-2]
     paper_name = os.path.splitext(parts[-1])[0]
@@ -331,8 +379,10 @@ def process_paper_tar(paper_tarname: str) -> None:
     except tarfile.ReadError:
         logging.debug('File %s is not a tar' % paper_tarname)
         return
-    print('generating paper diffs {}'.format(paper_tarname))
-    diffs, black_ims_paths = generate_diffs(paper_dir)
+    try:
+        diffs, black_ims_paths = generate_diffs(paper_dir)
+    except TypeError:
+        return
     if diffs is None:
         return
     figures_by_page = dict()
@@ -340,7 +390,10 @@ def process_paper_tar(paper_tarname: str) -> None:
         figures = consume_diff_generate_figures(diff)
         if figures is None:
             continue
-        figures = augment_images(black_ims_paths[idx], figures)
+        try:
+            figures = augment_images(black_ims_paths[idx], figures)
+        except Exception as e:
+            print("Error augmenting images for image path: {}. Exception message: {}".format(black_ims_paths[idx], e))
         page_name = os.path.dirname(diff) + '/' + diff[diff.find('black.pdf-'):]
         figures_by_page[page_name] = figures
     file_util.safe_makedirs(os.path.dirname(result_path))
@@ -364,13 +417,13 @@ def process_paper_tar_with_timeout(paper_tarname: str) -> None:
 
 
 def download_and_extract_tar(
-    tarname: str, extract_dir: str, n_attempts: int=100
+        tarname: str, extract_dir: str, n_attempts: int = 100
 ) -> None:
     print('.', end='', flush=True)
     logging.info('Downloading %s' % tarname)
     for attempt in range(n_attempts):
         try:
-            cached_file = file_util.cache_file(tarname, cache_dir=settings.ARXIV_DATA_CACHE_DIR)
+            cached_file = file_util.cache_file_2(tarname, cache_dir=settings.ARXIV_DATA_CACHE_DIR)
             break
         except FileNotFoundError:
             if attempt == n_attempts - 1:
@@ -379,7 +432,7 @@ def download_and_extract_tar(
             time.sleep(10)
     logging.info("Proceeding to extract tar file: {}".format(cached_file))
     file_util.extract_tarfile(cached_file, extract_dir)
-    #os.remove(cached_file)
+    # os.remove(cached_file)
 
 
 def run_on_all() -> None:
@@ -389,8 +442,63 @@ def run_on_all() -> None:
     #     tarname for tarname in file_util.iterate_s3_files(ARXIV_TAR_SRC)
     #     if os.path.splitext(tarname)[1] == '.tar'
     # ]
-    #tarnames = ['s3://arxiv/src/arXiv_src_0001_001.tar', 's3://arxiv/src/arXiv_src_0002_001.tar']
-    tarnames = ["s3://arxiv/src/arXiv_src_0611_001.tar", "s3://arxiv/src/arXiv_src_0611_002.tar"]
+    # import json
+    # import random
+    # all_tarnames = json.load(open('all_tarnames.json'))
+    # tarnames = random.choices(all_tarnames, k=31)
+    # print(tarnames)
+    tarnames = [
+        "s3://arxiv/src/arXiv_src_0003_001.tar",
+        "s3://arxiv/src/arXiv_src_0104_001.tar",
+        "s3://arxiv/src/arXiv_src_0306_001.tar",
+        "s3://arxiv/src/arXiv_src_0508_002.tar",
+        "s3://arxiv/src/arXiv_src_0611_001.tar",
+        "s3://arxiv/src/arXiv_src_0611_002.tar",
+        "s3://arxiv/src/arXiv_src_0704_001.tar",
+        "s3://arxiv/src/arXiv_src_0807_001.tar",
+        "s3://arxiv/src/arXiv_src_0812_004.tar",
+        "s3://arxiv/src/arXiv_src_0901_001.tar",
+        "s3://arxiv/src/arXiv_src_0903_005.tar",
+        "s3://arxiv/src/arXiv_src_0904_004.tar",
+        "s3://arxiv/src/arXiv_src_1001_002.tar",
+        "s3://arxiv/src/arXiv_src_1004_006.tar",
+        "s3://arxiv/src/arXiv_src_1008_002.tar",
+        "s3://arxiv/src/arXiv_src_1012_006.tar",
+        "s3://arxiv/src/arXiv_src_1103_006.tar",
+        "s3://arxiv/src/arXiv_src_1106_004.tar",
+        "s3://arxiv/src/arXiv_src_1110_005.tar",
+        "s3://arxiv/src/arXiv_src_1110_008.tar",
+        "s3://arxiv/src/arXiv_src_1110_013.tar",
+        "s3://arxiv/src/arXiv_src_1203_002.tar",
+        "s3://arxiv/src/arXiv_src_1206_001.tar",
+        "s3://arxiv/src/arXiv_src_1207_004.tar",
+        "s3://arxiv/src/arXiv_src_1207_005.tar",
+        "s3://arxiv/src/arXiv_src_1208_003.tar",
+        "s3://arxiv/src/arXiv_src_1210_013.tar",
+        "s3://arxiv/src/arXiv_src_1212_010.tar",
+        "s3://arxiv/src/arXiv_src_1302_002.tar",
+        "s3://arxiv/src/arXiv_src_1305_007.tar",
+        "s3://arxiv/src/arXiv_src_1308_004.tar",
+        "s3://arxiv/src/arXiv_src_1309_009.tar",
+        "s3://arxiv/src/arXiv_src_1310_019.tar",
+        "s3://arxiv/src/arXiv_src_1405_013.tar",
+        "s3://arxiv/src/arXiv_src_1411_014.tar",
+        "s3://arxiv/src/arXiv_src_1508_004.tar",
+        "s3://arxiv/src/arXiv_src_1611_022.tar",
+        "s3://arxiv/src/arXiv_src_1612_010.tar",
+        "s3://arxiv/src/arXiv_src_1702_006.tar",
+        "s3://arxiv/src/arXiv_src_1703_008.tar",
+        "s3://arxiv/src/arXiv_src_1706_021.tar",
+        "s3://arxiv/src/arXiv_src_1806_001.tar",
+        "s3://arxiv/src/arXiv_src_1807_007.tar",
+        "s3://arxiv/src/arXiv_src_1808_009.tar",
+        "s3://arxiv/src/arXiv_src_1808_030.tar",
+        "s3://arxiv/src/arXiv_src_1810_020.tar",
+        "s3://arxiv/src/arXiv_src_1909_026.tar",
+        "s3://arxiv/src/arXiv_src_1910_015.tar",
+        "s3://arxiv/src/arXiv_src_9601_001.tar",
+        "s3://arxiv/src/arXiv_src_1910_022.tar"
+    ]
     # Process all papers simultaneously to avoid blocking on the ones
     # where pdflatex runs forever
     grouped_tarnames = figure_utils.ordered_group_by(
@@ -402,7 +510,7 @@ def run_on_all() -> None:
         # with tempfile.TemporaryDirectory(
         #     prefix=settings.ARXIV_DATA_TMP_DIR
         # ) as tmpdir:
-        # tmpdir += '/'
+        tmpdir += '/'
         f = functools.partial(download_and_extract_tar, extract_dir=tmpdir)
         print(
             'Downloading %d tarfiles in group %s' %
@@ -416,9 +524,9 @@ def run_on_all() -> None:
             'Processing %d papers in group %s' %
             (len(paper_tarnames), str(group_key))
         )
-        with multiprocessing.Pool(processes=round(1)
+        with multiprocessing.Pool(processes=round(settings.PROCESS_PAPER_TAR_THREAD_COUNT)
                                   ) as p:
-            p.map(process_paper_tar_with_timeout, paper_tarnames)
+            p.map(process_paper_tar, paper_tarnames)
 
 
 if __name__ == "__main__":

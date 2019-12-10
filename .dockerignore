@@ -11,5 +11,6 @@
 !vendor
 !weights
 !credentials
+!weights
 !figure_json_transformer.py
-!awscliv2.zip
+!hypes.json

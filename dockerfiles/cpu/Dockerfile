@@ -4,6 +4,15 @@ FROM tensorflow/tensorflow:1.14.0-py3
 
 ENV LC_ALL C.UTF-8
 
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+RUN apt-get update
+RUN apt-get install -y libjasper1 libjasper-dev
+
 # install system packages
 
 ENV TZ=Europe/Minsk
@@ -59,18 +68,17 @@ RUN pip3 install -e /work/vendor/tensorboxresnet
 ADD . /work
 RUN pip3 install --quiet -e /work
 
-RUN pip3 install Pillow
-
-RUN apt-get install curl
-
-RUN unzip awscliv2.zip
-RUN ./aws/install
 RUN mkdir ~/.aws
 ADD credentials /work
 RUN cat /work/credentials > ~/.aws/credentials
-RUN apt install -y vim jq
 
 RUN pip install six numpy scipy Pillow matplotlib scikit-image opencv-python imageio Shapely
 RUN pip install imgaug
+
+ENV IN_DOCKER Yes
+
+#ADD https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/deepfigures/weights.tar.gz /work
+#RUN tar -xf /work/weights.tar.gz
+#RUN rm weights.tar.gz
 
 CMD [ "/bin/bash" ]

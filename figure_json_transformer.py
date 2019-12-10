@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import os
 
 # import tensorboxresnet.utils.annolist.AnnotationLib as al
 
@@ -13,14 +14,17 @@ caption_boundaries = []
 for filename in Path(figure_json_path).rglob('*.json'):
     contents = json.load(open(str(filename)))
     for key, value in contents.items():
+        dir_name, file = os.path.split(key)
+        correct_path = os.path.join(dir_name, 'black.pdf-images/ghostscript/dpi100', file)
+
         if not len(value):
             continue
         figure_annotation = {
-            "image_path": key,
+            "image_path": correct_path,
             "rects": [ann['figure_boundary'] for ann in value]
         }
         caption_annotation = {
-            "image_path": key,
+            "image_path": correct_path,
             "rects": [ann['caption_boundary'] for ann in value]
         }
         figure_boundaries.append(figure_annotation)

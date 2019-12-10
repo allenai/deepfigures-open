@@ -168,6 +168,36 @@ def cache_file(name, cache_dir=None):
     return target_filename
 
 
+def cache_file_2(name, cache_dir=None):
+    if not name.startswith('s3://'):
+        return name
+
+    if not cache_dir:
+        cache_dir = _cache_dir()
+
+    s3_last_modified = last_modified(name)
+    cleaned_name = name[5:].replace('/', '_')
+    target_filename = os.path.join(cache_dir, cleaned_name)
+    if os.path.exists(target_filename):
+        if s3_last_modified is None or last_modified(
+            target_filename
+        ) >= s3_last_modified:
+            return target_filename
+
+    logging.info('Cache file for %s does not exist, copying.', name)
+    parse = _parse_s3_location(name)
+    retcode = subprocess.call(
+        'aws s3api get-object --bucket "%s" --key "%s" "%s" --request-payer=requester'
+        % (parse['bucket'], parse['key'], target_filename),
+        stdout=subprocess.DEVNULL,
+        shell=True
+    )
+    if retcode != 0:
+        raise FileNotFoundError('Failed to copy %s' % name)
+    assert os.system('chmod 777 "%s"' % (target_filename)) == 0
+    return target_filename
+
+
 def s3_location_to_object(path):
     s3 = boto3.resource('s3')
 
