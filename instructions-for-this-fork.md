@@ -101,5 +101,41 @@ Here, the python environment created in one of the steps above should be activat
 - ``'/home/sampanna/workspace/bdts2/deepfigures-results'`` is the host path to the output directory to put the detection results in.
 - ``'/home/sampanna/workspace/bdts2/deepfigures-results/LD5655.V855_1935.C555.pdf'`` is the host path to the PDF file to be processes.
 
+## Instruction to run on ARC using [Singularity][singularity-homepage]:
+Docker is not available on Virginia Tech's [Advanced Research Computing][vt-arc-homepage] HPC cluster.
+However, Singularity can be used to run pre-built Docker images on ARC using singularity.
+
+#### Load the module:
+Each time you ssh into either the login node or any of the compute nodes, please lode the Singularity module using:
+```shell script
+module load singularity/3.3.0
+```
+
+#### Create the singularity directory:
+```shell script
+mkdir /work/cascades/${USER}/singularity
+```
+Make the directory required for Singularity.
+
+#### Pull the Docker image:
+```shell script
+singularity pull docker://sampyash/vt_cs_6604_digital_libraries:deepfigures_gpu_0.0.5
+```
+- This command will pull the given image from Docker Hub.
+- This command needs internet access and hence needs to be run on the login node.
+- This command will take some time.
+
+#### Run the pulled image:
+```shell script
+singularity run --nv -B /home/sampanna/deepfigures-results:/work/host-output -B /home/sampanna/deepfigures-results:/work/host-input /work/cascades/sampanna/singularity/vt_cs_6604_digital_libraries_deepfigures_cpu_0.0.5.sif /bin/bash
+```
+- This command will run the pulled Docker image and give the user the shel access inside the container.
+- The ``--nv`` flag is analogous to the  ``--gpus all`` option of Docker.
+- The ``-B`` flag is analogous to the ``--volume`` option of Docker.
+
+The executions of the remaining commands is straightforward is left as an exercise to the reader.
+
 [docker-hub-link]: https://hub.docker.com/r/sampyash/vt_cs_6604_digital_libraries/tags
 [docker-commandline-run-docs]: https://docs.docker.com/engine/reference/commandline/run
+[singularity-homepage]: https://singularity.lbl.gov
+[vt-arc-homepage]: https://www.arc.vt.edu
