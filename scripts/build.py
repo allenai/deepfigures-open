@@ -32,6 +32,7 @@ def build():
                 version=settings.VERSION,
                 dockerfile_path=dockerfile_path),
             logger)
+        break
 
 
 if __name__ == '__main__':

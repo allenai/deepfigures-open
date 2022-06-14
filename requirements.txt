@@ -10,7 +10,6 @@ cffi
 dask
 editdistance
 elasticsearch
-fastparquet
 keras
 lxml
 matplotlib
@@ -26,3 +25,4 @@ seaborn
 tqdm
 typing
 PyYAML
+imageio

@@ -20,7 +20,7 @@ compile the utility and place it into the `bin/` directory:
 
     git clone https://github.com/allenai/pdffigures2
     cd pdffigures2
-    sbt assembly
+    sbt "set test in assembly := {}" clean assembly ### sbt assembly
     mv target/scala-2.11/pdffigures2-assembly-0.0.12-SNAPSHOT.jar ../bin
     cd ..
     rm -rf pdffigures2

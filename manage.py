@@ -18,6 +18,7 @@ from scripts import (
     generatearxiv,
     generatepubmed,
     testunits)
+from scripts.rundetection import rundetection
 
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,8 @@ subcommands = [
     detectfigures.detectfigures,
     generatearxiv.generatearxiv,
     generatepubmed.generatepubmed,
-    testunits.testunits
+    testunits.testunits,
+    rundetection
 ]
 
 for subcommand in subcommands:
