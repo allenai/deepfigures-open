@@ -8,6 +8,9 @@ import cv2  # Need to import OpenCV before tensorflow to avoid import error
 from scipy.misc import imread, imsave
 import numpy as np
 
+from PIL import Image
+from pdf2image import convert_from_path
+
 from deepfigures.extraction import (
     tensorbox_fourchannel,
     pdffigures_wrapper,
@@ -104,6 +107,26 @@ def extract_figures_json(
     output_path = os.path.join(
         output_directory,
         os.path.basename(pdf_path)[:-4] + 'deepfigures-results.json')
+    
+    # extract images only 
+    print('[INFO] Extracting image')
+    pages = convert_from_path(pdf_path, 100)
+    print('[INFO] Page lengh: '+ str(len(pages)))
+    data = pdf_detection_result.to_dict()
+    i = 1
+    for oneImage in data["figures"]:
+        caption = oneImage['caption_text']
+        print('[INFO] ' + caption)
+        region = oneImage['figure_boundary']
+        pageOrder = oneImage['page']
+        temp_path = os.path.join(output_directory, str(i) + '_org.jpg')
+        real_path = os.path.join(output_directory, str(i) + '.jpg')
+        pages[pageOrder].save(temp_path, 'JPEG')
+        original = Image.open(temp_path)
+        original.crop((region['x1'], region['y1'], region['x2'], region['y2'])).save(real_path)
+        os.remove(temp_path)
+        i = i + 1
+    
     file_util.write_json_atomic(
         output_path,
         pdf_detection_result.to_dict(),
