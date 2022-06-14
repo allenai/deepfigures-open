@@ -13,3 +13,6 @@ pdffigures2/
 # build files
 *.so
 *.o
+weights
+bin
+.vscode

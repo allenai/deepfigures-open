@@ -2,6 +2,8 @@
 
 FROM tensorflow/tensorflow:latest-gpu-py3
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 ENV LC_ALL C.UTF-8
 
 # install system packages
@@ -18,8 +20,7 @@ RUN apt-get clean \
     zlib1g-dev \
     libjpeg8-dev \
     libtiff5-dev \
-    libjasper-dev \
-    libpng12-dev \
+    libpng-dev \
     tcl-dev \
     tk-dev \
     python3 \
@@ -33,6 +34,10 @@ RUN apt-get clean \
     texlive-fonts-extra \
     texlive-latex-extra
 
+RUN git clone https://github.com/jasperproject/jasper-client.git jasper && \
+ 		chmod +x jasper/jasper.py && \
+		pip3 install -r jasper/client/requirements.txt
+
 WORKDIR /work
 
 # install python packages
@@ -43,8 +48,19 @@ RUN pip3 install --upgrade pip \
  && pip install Cython==0.25.2
 RUN pip3 install -r ./requirements.txt
 
+RUN pip3 install git+https://github.com/martindurant/fastparquet.git
+
+RUN pip3 install --upgrade beautifulsoup4
+
 ADD ./vendor/tensorboxresnet /work/vendor/tensorboxresnet
 RUN pip3 install -e /work/vendor/tensorboxresnet
+
+RUN pip3 install tensorflow==1.15
+
+RUN pip3 install scipy==1.0.1
+RUN pip3 install pdf2image
+
+RUN apt-get install -y python-poppler
 
 ADD . /work
 RUN pip3 install --quiet -e /work

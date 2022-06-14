@@ -55,9 +55,8 @@ def detectfigures(
     internal_output_directory = '/work/host-output'
     internal_pdf_directory = '/work/host-input'
 
-    internal_pdf_path = os.path.join(
-        internal_pdf_directory, pdf_name)
-
+    internal_pdf_path = internal_pdf_directory + '/' + pdf_name
+    
     execute(
         'docker run'
         ' --rm'
